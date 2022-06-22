@@ -2,7 +2,7 @@ const multer = require("multer");
 
 const storageNavigation = multer.diskStorage({
     destination: function(req, file, cb) {
-        cb(null, "../smooth_player_api/upload/image/user");
+        cb(null, "../expense_tracker_api/upload");
     },
     filename: function(req, file, cb) {
         cb(null, Date.now()+"_"+file.originalname);
@@ -19,9 +19,9 @@ const filter = function(req, file, cb) {
     }
 }
 
-const upload = multer({
+const profileUpload = multer({
     storage: storageNavigation,
     fileFilter: filter
 });
 
-module.exports = upload;
+module.exports = profileUpload;
