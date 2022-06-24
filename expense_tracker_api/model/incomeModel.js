@@ -13,8 +13,7 @@ const incomeSchema = new mongoose.Schema(
     },
 
     amount: {
-      type: String,
-      trim: true,
+      type: Number,
     },
 
     category: {
