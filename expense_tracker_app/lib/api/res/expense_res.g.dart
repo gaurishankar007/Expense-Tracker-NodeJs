@@ -37,6 +37,7 @@ Map<String, dynamic> _$ExpenseCategorizedToJson(ExpenseCategorized instance) =>
 
 ExpenseDWM _$ExpenseDWMFromJson(Map<String, dynamic> json) => ExpenseDWM(
       profilePicture: json['profilePicture'] as String?,
+      firstExpenseDate: json['firstExpenseDate'] as String?,
       todayExpenses: (json['todayExpenses'] as List<dynamic>?)
           ?.map((e) => ExpenseData.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -65,6 +66,7 @@ ExpenseDWM _$ExpenseDWMFromJson(Map<String, dynamic> json) => ExpenseDWM(
 Map<String, dynamic> _$ExpenseDWMToJson(ExpenseDWM instance) =>
     <String, dynamic>{
       'profilePicture': instance.profilePicture,
+      'firstExpenseDate': instance.firstExpenseDate,
       'todayExpenses': instance.todayExpenses,
       'thisWeekExpenses': instance.thisWeekExpenses,
       'thisMonthExpenses': instance.thisMonthExpenses,

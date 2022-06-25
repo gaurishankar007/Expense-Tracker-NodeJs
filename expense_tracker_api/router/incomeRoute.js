@@ -160,8 +160,11 @@ router.get("/income/getDWM", auth.verifyUser, async (req, res) => {
     },
   ]);
 
+  const firstIncome = await income.findOne().sort({ createdAt: 1 });
+
   res.send({
     profilePicture: req.userInfo.profilePicture,
+    firstIncomeDate: firstIncome.createdAt.toISOString().split("T")[0],
     todayIncomes: todayIncomes,
     thisWeekIncomes: thisWeekIncomes,
     thisMonthIncomes: thisMonthIncomes,
@@ -225,6 +228,51 @@ router.post("/income/getSpecific", async (req, res) => {
     incomeAmount: incomeAmount,
     incomeCategories: incomeCategories,
   });
+});
+
+router.delete("/income/remove", (req, res) => {
+  income.findOneAndDelete({ _id: req.body.incomeId }).then(() => {
+    res.send({ resM: "Income removed." });
+  });
+});
+
+router.put("/income/edit", (req, res) => {
+  const incomeId = req.body.incomeId;
+  const name = req.body.name;
+  const amount = req.body.amount;
+  const category = req.body.category;
+
+  const nameRegex = /^[a-zA-Z\s]*$/;
+  const amountRegex = new RegExp("^[0-9]+$");
+
+  if (name.trim() === "" || amount.trim() === "" || category.trim() === "") {
+    return res.status(400).send({ resM: "Provide all information." });
+  } else if (!nameRegex.test(name)) {
+    return res.status(400).send({ resM: "Invalid income name." });
+  } else if (name.length <= 2 || name.length >= 16) {
+    return res
+      .status(400)
+      .send({ resM: "Income name most contain 3 to 15 characters." });
+  } else if (!amountRegex.test(amount)) {
+    return res.status(400).send({ resM: "Invalid amount." });
+  } else if (amount.length >= 8) {
+    return res
+      .status(400)
+      .send({ resM: "Income amount most be less than one crore" });
+  }
+
+  income
+    .updateOne(
+      { _id: incomeId },
+      {
+        name: name,
+        amount: amount,
+        category: category,
+      }
+    )
+    .then(() => {
+      res.send({ resM: "Income edited." });
+    });
 });
 
 module.exports = router;

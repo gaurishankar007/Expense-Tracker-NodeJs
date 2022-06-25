@@ -160,8 +160,11 @@ router.get("/expense/getDWM", auth.verifyUser, async (req, res) => {
     },
   ]);
 
+  const firstExpense = await expense.findOne().sort({ createdAt: 1 });
+
   res.send({
     profilePicture: req.userInfo.profilePicture,
+    firstExpenseDate: firstExpense.createdAt.toISOString().split("T")[0],
     todayExpenses: todayExpenses,
     thisWeekExpenses: thisWeekExpenses,
     thisMonthExpenses: thisMonthExpenses,
@@ -225,6 +228,51 @@ router.post("/expense/getSpecific", async (req, res) => {
     expenseAmount: expenseAmount,
     expenseCategories: expenseCategories,
   });
+});
+
+router.delete("/expense/remove", (req, res) => {
+  expense.findOneAndDelete({ _id: req.body.expenseId }).then(() => {
+    res.send({ resM: "Expense removed." });
+  });
+});
+
+router.put("/expense/edit", (req, res) => {
+  const expenseId = req.body.expenseId;
+  const name = req.body.name;
+  const amount = req.body.amount;
+  const category = req.body.category;
+
+  const nameRegex = /^[a-zA-Z\s]*$/;
+  const amountRegex = new RegExp("^[0-9]+$");
+
+  if (name.trim() === "" || amount.trim() === "" || category.trim() === "") {
+    return res.status(400).send({ resM: "Provide all information." });
+  } else if (!nameRegex.test(name)) {
+    return res.status(400).send({ resM: "Invalid expense name." });
+  } else if (name.length <= 2 || name.length >= 16) {
+    return res
+      .status(400)
+      .send({ resM: "Expense name most contain 3 to 15 characters." });
+  } else if (!amountRegex.test(amount)) {
+    return res.status(400).send({ resM: "Invalid amount." });
+  } else if (amount.length >= 8) {
+    return res
+      .status(400)
+      .send({ resM: "Expense amount most be less than one crore" });
+  }
+
+  expense
+    .updateOne(
+      { _id: expenseId },
+      {
+        name: name,
+        amount: amount,
+        category: category,
+      }
+    )
+    .then(() => {
+      res.send({ resM: "Expense edited." });
+    });
 });
 
 module.exports = router;

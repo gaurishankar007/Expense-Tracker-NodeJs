@@ -59,4 +59,38 @@ class IncomeHttp {
 
     return IncomeSpecific.fromJson(resData);
   }
+
+  Future<Map> removeIncome(String incomeId) async {
+    final response = await delete(
+      Uri.parse(routeUrl + "income/remove"),
+      body: {"incomeId": incomeId},
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer $token",
+      },
+    );
+
+    return jsonDecode(response.body) as Map;
+  }
+
+  Future<Map> editIncome(IncomeData income) async {
+    Map<String, String> incomeData = {
+      "incomeId": income.id!,
+      "name": income.name!,
+      "amount": income.amount!.toString(),
+      "category": income.category!,
+    };
+
+    final response = await put(
+      Uri.parse(routeUrl + "income/edit"),
+      body: incomeData,
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer $token",
+      },
+    );
+
+    return {
+      "statusCode": response.statusCode,
+      "body": jsonDecode(response.body)
+    };
+  }
 }

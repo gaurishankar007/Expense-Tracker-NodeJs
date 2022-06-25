@@ -46,6 +46,7 @@ class IncomeCategorized {
 @JsonSerializable(explicitToJson: true)
 class IncomeDWM {
   String? profilePicture;
+  String? firstIncomeDate;
   List<IncomeData>? todayIncomes;
   List<IncomeData>? thisWeekIncomes;
   List<IncomeData>? thisMonthIncomes;
@@ -58,6 +59,7 @@ class IncomeDWM {
 
   IncomeDWM({
     this.profilePicture,
+    this.firstIncomeDate,
     this.todayIncomes,
     this.thisWeekIncomes,
     this.thisMonthIncomes,

@@ -12,32 +12,32 @@ void main() {
       if (value.isNotEmpty) {
         LogStatus.token = value;
 
-        runApp(const SmoothPlayer(initialPage: Home()));
+        runApp(const ExpenseTracker(initialPage: Home()));
       } else {
-        runApp(const SmoothPlayer(initialPage: Login()));
+        runApp(const ExpenseTracker(initialPage: Login()));
       }
     },
   );
 }
 
-class SmoothPlayer extends StatefulWidget {
+class ExpenseTracker extends StatefulWidget {
   final Widget? initialPage;
-  const SmoothPlayer({
+  const ExpenseTracker({
     Key? key,
     @required this.initialPage,
   }) : super(key: key);
 
   @override
-  State<SmoothPlayer> createState() => _SmoothPlayerState();
+  State<ExpenseTracker> createState() => _ExpenseTrackerState();
 }
 
-class _SmoothPlayerState extends State<SmoothPlayer> {
+class _ExpenseTrackerState extends State<ExpenseTracker> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(),
       debugShowCheckedModeBanner: false,
-      title: 'Smooth Player Music App',
+      title: 'Expense Income Tracker',
       home: widget.initialPage,
     );
   }

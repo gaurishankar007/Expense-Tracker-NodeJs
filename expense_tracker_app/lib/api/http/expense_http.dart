@@ -60,4 +60,38 @@ class ExpenseHttp {
 
     return ExpenseSpecific.fromJson(resData);
   }
+
+  Future<Map> removeExpense(String expenseId) async {
+    final response = await delete(
+      Uri.parse(routeUrl + "expense/remove"),
+      body: {"expenseId": expenseId},
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer $token",
+      },
+    );
+
+    return jsonDecode(response.body) as Map;
+  }
+
+  Future<Map> editExpense(ExpenseData expense) async {
+    Map<String, String> expenseData = {
+      "expenseId": expense.id!,
+      "name": expense.name!,
+      "amount": expense.amount!.toString(),
+      "category": expense.category!,
+    };
+
+    final response = await put(
+      Uri.parse(routeUrl + "expense/edit"),
+      body: expenseData,
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer $token",
+      },
+    );
+
+    return {
+      "statusCode": response.statusCode,
+      "body": jsonDecode(response.body)
+    };
+  }
 }

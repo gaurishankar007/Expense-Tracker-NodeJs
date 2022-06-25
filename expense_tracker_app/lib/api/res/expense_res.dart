@@ -47,6 +47,7 @@ class ExpenseCategorized {
 @JsonSerializable()
 class ExpenseDWM {
   String? profilePicture;
+  String? firstExpenseDate;
   List<ExpenseData>? todayExpenses;
   List<ExpenseData>? thisWeekExpenses;
   List<ExpenseData>? thisMonthExpenses;
@@ -59,6 +60,7 @@ class ExpenseDWM {
 
   ExpenseDWM({
     this.profilePicture,
+    this.firstExpenseDate,
     this.todayExpenses,
     this.thisWeekExpenses,
     this.thisMonthExpenses,
