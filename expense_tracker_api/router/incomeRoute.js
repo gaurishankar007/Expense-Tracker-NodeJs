@@ -1,7 +1,6 @@
 const express = require("express");
 const router = new express.Router();
 const auth = require("../authentication/auth");
-const user = require("../model/userModel");
 const income = require("../model/incomeModel");
 
 router.post("/income/add", auth.verifyUser, (req, res) => {
@@ -106,7 +105,10 @@ router.get("/income/getDWM", auth.verifyUser, async (req, res) => {
   );
 
   const todayIncomes = await income
-    .find({ createdAt: { $gte: new Date(Date.now() - today) } })
+    .find({
+      user: req.userInfo._id,
+      createdAt: { $gte: new Date(Date.now() - today) },
+    })
     .sort({ amount: -1 });
 
   var todayIncomeAmount = 0;
@@ -116,6 +118,7 @@ router.get("/income/getDWM", auth.verifyUser, async (req, res) => {
 
   const thisWeekIncomes = await income
     .find({
+      user: req.userInfo._id,
       createdAt: {
         $gte: weekFirstDate,
         $lte: weekLastDate,
@@ -130,7 +133,7 @@ router.get("/income/getDWM", auth.verifyUser, async (req, res) => {
   }
 
   const thisMonthIncomes = await income
-    .find({ createdAt: { $gte: thisMonth } })
+    .find({ user: req.userInfo._id, createdAt: { $gte: thisMonth } })
     .sort({ amount: -1 });
 
   var thisMonthIncomeAmount = 0;
@@ -140,27 +143,39 @@ router.get("/income/getDWM", auth.verifyUser, async (req, res) => {
   }
 
   const todayIncomeCategories = await income.aggregate([
-    { $match: { createdAt: { $gte: new Date(Date.now() - today) } } },
+    {
+      $match: {
+        user: req.userInfo._id,
+        createdAt: { $gte: new Date(Date.now() - today) },
+      },
+    },
     {
       $group: { _id: "$category", amount: { $sum: "$amount" } },
     },
   ]);
 
   const thisWeekIncomeCategories = await income.aggregate([
-    { $match: { createdAt: { $gte: weekFirstDate, $lte: weekLastDate } } },
+    {
+      $match: {
+        user: req.userInfo._id,
+        createdAt: { $gte: weekFirstDate, $lte: weekLastDate },
+      },
+    },
     {
       $group: { _id: "$category", amount: { $sum: "$amount" } },
     },
   ]);
 
   const thisMonthIncomeCategories = await income.aggregate([
-    { $match: { createdAt: { $gte: thisMonth } } },
+    { $match: { user: req.userInfo._id, createdAt: { $gte: thisMonth } } },
     {
       $group: { _id: "$category", amount: { $sum: "$amount" } },
     },
   ]);
 
-  const firstIncome = await income.findOne().sort({ createdAt: 1 });
+  const firstIncome = await income
+    .findOne({ user: req.userInfo._id })
+    .sort({ createdAt: 1 });
 
   res.send({
     profilePicture: req.userInfo.profilePicture,
@@ -177,7 +192,7 @@ router.get("/income/getDWM", auth.verifyUser, async (req, res) => {
   });
 });
 
-router.post("/income/getSpecific", async (req, res) => {
+router.post("/income/getSpecific", auth.verifyUser, async (req, res) => {
   const sDate = req.body.startDate;
   const eDate = req.body.endDate;
 
@@ -197,6 +212,7 @@ router.post("/income/getSpecific", async (req, res) => {
 
   const incomes = await income
     .find({
+      user: req.userInfo._id,
       createdAt: {
         $gte: startDate,
         $lte: endDate,
@@ -212,6 +228,7 @@ router.post("/income/getSpecific", async (req, res) => {
   const incomeCategories = await income.aggregate([
     {
       $match: {
+        user: req.userInfo._id,
         createdAt: {
           $gte: startDate,
           $lte: endDate,

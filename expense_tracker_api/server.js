@@ -21,6 +21,9 @@ app.use(expense);
 const income = require("./router/incomeRoute");
 app.use(income);
 
+const home = require("./router/homeRoute");
+app.use(home);
+
 app.listen(8848, () => {
   console.log("Server running on port: 8848...");
 });

@@ -1,3 +1,5 @@
+import 'package:expense_tracker/api/http/home_http.dart';
+import 'package:expense_tracker/api/res/home_res.dart';
 import 'package:flutter/material.dart';
 
 import '../resource/colors.dart';
@@ -15,6 +17,8 @@ class _HomeState extends State<Home> {
   int curTime = DateTime.now().hour;
   String greeting = "Expense Tracker";
 
+  late Future<HomeData> userHomeData;
+
   @override
   void initState() {
     super.initState();
@@ -25,6 +29,8 @@ class _HomeState extends State<Home> {
     } else {
       greeting = "Good Evening";
     }
+
+    userHomeData = HomeHttp().viewHome();
   }
 
   @override
@@ -75,6 +81,45 @@ class _HomeState extends State<Home> {
               SizedBox(
                 height: 10,
               ),
+              FutureBuilder(
+                future: userHomeData,
+                builder: ((context, snapshot) {
+                  List<Widget> children = [];
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    children = <Widget>[
+                      Container(
+                        width: sWidth * 0.97,
+                        height: sHeight,
+                        alignment: Alignment.center,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 3,
+                          color: AppColors.primary,
+                        ),
+                      )
+                    ];
+                  } else {
+                    if (snapshot.hasData) {
+                    } else if (snapshot.hasError) {
+                      children = <Widget>[
+                        Container(
+                          width: sWidth * 0.97,
+                          height: sHeight,
+                          alignment: Alignment.center,
+                          child: Text(
+                            "${snapshot.error}",
+                            style: TextStyle(
+                              fontSize: 15,
+                            ),
+                          ),
+                        )
+                      ];
+                    }
+                  }
+                  return Column(
+                    children: children,
+                  );
+                }),
+              )
             ],
           ),
         ),

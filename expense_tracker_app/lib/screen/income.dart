@@ -717,9 +717,13 @@ class _IncomeState extends State<Income> {
           ),
           Row(
             children: [
-              CircleAvatar(
-                backgroundColor: AppColors.primary,
-                radius: 8,
+              Container(
+                height: 15,
+                width: 15,
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.all(Radius.circular(2)),
+                ),
               ),
               SizedBox(
                 width: 5,
@@ -757,7 +761,7 @@ class _IncomeState extends State<Income> {
                   show: false,
                 ),
                 sectionsSpace: 0,
-                centerSpaceRadius: 30,
+                centerSpaceRadius: 40,
                 sections: category
                     .asMap()
                     .map((index, data) {
@@ -814,6 +818,10 @@ class _IncomeState extends State<Income> {
                 minVerticalPadding: 5,
                 visualDensity: VisualDensity(horizontal: 0, vertical: -4),
                 onTap: () {
+                  if (incomeIndex > 1) {
+                    return;
+                  }
+
                   showModalBottomSheet(
                     context: context,
                     backgroundColor: Colors.transparent,
@@ -895,6 +903,22 @@ class _IncomeState extends State<Income> {
                 );
               },
               child: Text("Add Income"),
+            ),
+          ],
+        ),
+      );
+    } else if (incomeIndex == 3) {
+      return SizedBox(
+        height: 300,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "No incomes",
+              style: TextStyle(
+                color: AppColors.text,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),

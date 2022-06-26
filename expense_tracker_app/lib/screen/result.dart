@@ -13,7 +13,6 @@ class _ResultState extends State<Result> {
   @override
   Widget build(BuildContext context) {
     final sWidth = MediaQuery.of(context).size.width;
-    final sHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       body: SafeArea(

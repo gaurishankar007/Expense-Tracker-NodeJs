@@ -721,9 +721,13 @@ class _ExpenseState extends State<Expense> {
           ),
           Row(
             children: [
-              CircleAvatar(
-                backgroundColor: AppColors.primary,
-                radius: 8,
+              Container(
+                height: 15,
+                width: 15,
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.all(Radius.circular(2)),
+                ),
               ),
               SizedBox(
                 width: 5,
@@ -761,7 +765,7 @@ class _ExpenseState extends State<Expense> {
                   show: false,
                 ),
                 sectionsSpace: 0,
-                centerSpaceRadius: 30,
+                centerSpaceRadius: 40,
                 sections: category
                     .asMap()
                     .map((index, data) {
@@ -902,6 +906,22 @@ class _ExpenseState extends State<Expense> {
                 );
               },
               child: Text("Add Expense"),
+            ),
+          ],
+        ),
+      );
+    } else if (expenseIndex == 3) {
+      return SizedBox(
+        height: 300,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "No expenses",
+              style: TextStyle(
+                color: AppColors.text,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),

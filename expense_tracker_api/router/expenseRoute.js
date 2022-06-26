@@ -1,7 +1,6 @@
 const express = require("express");
 const router = new express.Router();
 const auth = require("../authentication/auth");
-const user = require("../model/userModel");
 const expense = require("../model/expenseModel");
 
 router.post("/expense/add", auth.verifyUser, (req, res) => {
@@ -106,7 +105,10 @@ router.get("/expense/getDWM", auth.verifyUser, async (req, res) => {
   );
 
   const todayExpenses = await expense
-    .find({ createdAt: { $gte: new Date(Date.now() - today) } })
+    .find({
+      user: req.userInfo._id,
+      createdAt: { $gte: new Date(Date.now() - today) },
+    })
     .sort({ amount: -1 });
 
   var todayExpenseAmount = 0;
@@ -116,6 +118,7 @@ router.get("/expense/getDWM", auth.verifyUser, async (req, res) => {
 
   const thisWeekExpenses = await expense
     .find({
+      user: req.userInfo._id,
       createdAt: {
         $gte: weekFirstDate,
         $lte: weekLastDate,
@@ -130,7 +133,7 @@ router.get("/expense/getDWM", auth.verifyUser, async (req, res) => {
   }
 
   const thisMonthExpenses = await expense
-    .find({ createdAt: { $gte: thisMonth } })
+    .find({ user: req.userInfo._id, createdAt: { $gte: thisMonth } })
     .sort({ amount: -1 });
 
   var thisMonthExpenseAmount = 0;
@@ -140,27 +143,39 @@ router.get("/expense/getDWM", auth.verifyUser, async (req, res) => {
   }
 
   const todayExpenseCategories = await expense.aggregate([
-    { $match: { createdAt: { $gte: new Date(Date.now() - today) } } },
+    {
+      $match: {
+        user: req.userInfo._id,
+        createdAt: { $gte: new Date(Date.now() - today) },
+      },
+    },
     {
       $group: { _id: "$category", amount: { $sum: "$amount" } },
     },
   ]);
 
   const thisWeekExpenseCategories = await expense.aggregate([
-    { $match: { createdAt: { $gte: weekFirstDate, $lte: weekLastDate } } },
+    {
+      $match: {
+        user: req.userInfo._id,
+        createdAt: { $gte: weekFirstDate, $lte: weekLastDate },
+      },
+    },
     {
       $group: { _id: "$category", amount: { $sum: "$amount" } },
     },
   ]);
 
   const thisMonthExpenseCategories = await expense.aggregate([
-    { $match: { createdAt: { $gte: thisMonth } } },
+    { $match: { user: req.userInfo._id, createdAt: { $gte: thisMonth } } },
     {
       $group: { _id: "$category", amount: { $sum: "$amount" } },
     },
   ]);
 
-  const firstExpense = await expense.findOne().sort({ createdAt: 1 });
+  const firstExpense = await expense
+    .findOne({ user: req.userInfo._id })
+    .sort({ createdAt: 1 });
 
   res.send({
     profilePicture: req.userInfo.profilePicture,
@@ -177,7 +192,7 @@ router.get("/expense/getDWM", auth.verifyUser, async (req, res) => {
   });
 });
 
-router.post("/expense/getSpecific", async (req, res) => {
+router.post("/expense/getSpecific", auth.verifyUser, async (req, res) => {
   const sDate = req.body.startDate;
   const eDate = req.body.endDate;
 
@@ -197,6 +212,7 @@ router.post("/expense/getSpecific", async (req, res) => {
 
   const expenses = await expense
     .find({
+      user: req.userInfo._id,
       createdAt: {
         $gte: startDate,
         $lte: endDate,
@@ -212,6 +228,7 @@ router.post("/expense/getSpecific", async (req, res) => {
   const expenseCategories = await expense.aggregate([
     {
       $match: {
+        user: req.userInfo._id,
         createdAt: {
           $gte: startDate,
           $lte: endDate,
