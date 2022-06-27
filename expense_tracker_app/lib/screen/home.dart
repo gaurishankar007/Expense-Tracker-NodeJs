@@ -99,6 +99,7 @@ class _HomeState extends State<Home> {
                     ];
                   } else {
                     if (snapshot.hasData) {
+                      children = <Widget>[];
                     } else if (snapshot.hasError) {
                       children = <Widget>[
                         Container(
