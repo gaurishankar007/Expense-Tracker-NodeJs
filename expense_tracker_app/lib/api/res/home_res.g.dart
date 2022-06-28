@@ -13,6 +13,14 @@ HomeData _$HomeDataFromJson(Map<String, dynamic> json) => HomeData(
       thisMonthIncomes: (json['thisMonthIncomes'] as List<dynamic>?)
           ?.map((e) => IncomeData.fromJson(e as Map<String, dynamic>))
           .toList(),
+      thisMonthExpenseCategories: (json['thisMonthExpenseCategories']
+              as List<dynamic>?)
+          ?.map((e) => ExpenseCategorized.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      thisMonthIncomeCategories: (json['thisMonthIncomeCategories']
+              as List<dynamic>?)
+          ?.map((e) => IncomeCategorized.fromJson(e as Map<String, dynamic>))
+          .toList(),
       thisMonthExpenseAmount: json['thisMonthExpenseAmount'] as int?,
       thisMonthIncomeAmount: json['thisMonthIncomeAmount'] as int?,
       maxExpenseCategory: json['maxExpenseCategory'] == null
@@ -36,6 +44,8 @@ HomeData _$HomeDataFromJson(Map<String, dynamic> json) => HomeData(
 Map<String, dynamic> _$HomeDataToJson(HomeData instance) => <String, dynamic>{
       'thisMonthExpenses': instance.thisMonthExpenses,
       'thisMonthIncomes': instance.thisMonthIncomes,
+      'thisMonthExpenseCategories': instance.thisMonthExpenseCategories,
+      'thisMonthIncomeCategories': instance.thisMonthIncomeCategories,
       'thisMonthExpenseAmount': instance.thisMonthExpenseAmount,
       'thisMonthIncomeAmount': instance.thisMonthIncomeAmount,
       'maxExpenseCategory': instance.maxExpenseCategory,

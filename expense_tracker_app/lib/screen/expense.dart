@@ -674,9 +674,9 @@ class _ExpenseState extends State<Expense> {
             child: Row(
               children: [
                 Text(
-                  "Expense Categories:",
+                  "Expense Categories",
                   style: TextStyle(
-                    fontSize: 17,
+                    fontSize: 18,
                     color: AppColors.text,
                     fontWeight: FontWeight.bold,
                   ),
@@ -802,9 +802,9 @@ class _ExpenseState extends State<Expense> {
           Row(
             children: [
               Text(
-                "Expense Items:",
+                "Expense Items",
                 style: TextStyle(
-                  fontSize: 17,
+                  fontSize: 18,
                   color: AppColors.text,
                   fontWeight: FontWeight.bold,
                 ),

@@ -8,6 +8,8 @@ part 'home_res.g.dart';
 class HomeData {
   List<ExpenseData>? thisMonthExpenses;
   List<IncomeData>? thisMonthIncomes;
+  List<ExpenseCategorized>? thisMonthExpenseCategories;
+  List<IncomeCategorized>? thisMonthIncomeCategories;
   int? thisMonthExpenseAmount;
   int? thisMonthIncomeAmount;
   ExpenseCategorized? maxExpenseCategory;
@@ -22,6 +24,8 @@ class HomeData {
   HomeData({
     this.thisMonthExpenses,
     this.thisMonthIncomes,
+    this.thisMonthExpenseCategories,
+    this.thisMonthIncomeCategories,
     this.thisMonthExpenseAmount,
     this.thisMonthIncomeAmount,
     this.maxExpenseCategory,

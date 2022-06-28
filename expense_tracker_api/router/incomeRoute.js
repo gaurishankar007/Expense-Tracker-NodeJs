@@ -177,9 +177,14 @@ router.get("/income/getDWM", auth.verifyUser, async (req, res) => {
     .findOne({ user: req.userInfo._id })
     .sort({ createdAt: 1 });
 
+  const firstIncomeDate =
+    firstIncome === null
+      ? currentDateTime.toISOString().split("T")[0]
+      : firstIncome.createdAt.toISOString().split("T")[0];
+
   res.send({
     profilePicture: req.userInfo.profilePicture,
-    firstIncomeDate: firstIncome.createdAt.toISOString().split("T")[0],
+    firstIncomeDate: firstIncomeDate,
     todayIncomes: todayIncomes,
     thisWeekIncomes: thisWeekIncomes,
     thisMonthIncomes: thisMonthIncomes,

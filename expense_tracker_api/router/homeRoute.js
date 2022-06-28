@@ -20,13 +20,15 @@ router.get("/user/getHome", auth.verifyUser, async (req, res) => {
 
   const previousMonth = new Date(thisMonth.getTime() - 2592000000);
 
-  const thisMonthExpenses = await expense
-    .find({ user: req.userInfo._id, createdAt: { $gte: thisMonth } })
-    .sort({ amount: -1 });
+  const thisMonthExpenses = await expense.find({
+    user: req.userInfo._id,
+    createdAt: { $gte: thisMonth },
+  });
 
-  const thisMonthIncomes = await income
-    .find({ user: req.userInfo._id, createdAt: { $gte: thisMonth } })
-    .sort({ amount: -1 });
+  const thisMonthIncomes = await income.find({
+    user: req.userInfo._id,
+    createdAt: { $gte: thisMonth },
+  });
 
   var thisMonthExpenseAmount = 0;
   const maxExpenseCategory = { _id: "Nan", amount: -1 };
@@ -46,7 +48,7 @@ router.get("/user/getHome", auth.verifyUser, async (req, res) => {
   }
 
   var thisMonthIncomeAmount = 0;
-  const maxIncomeCategory = { _id: "Nan", amount: 0 };
+  const maxIncomeCategory = { _id: "Nan", amount: -1 };
   const thisMonthIncomeCategories = await income.aggregate([
     { $match: { user: req.userInfo._id, createdAt: { $gte: thisMonth } } },
     {
@@ -62,7 +64,7 @@ router.get("/user/getHome", auth.verifyUser, async (req, res) => {
     }
   }
 
-  const previousMonthExpenseAmount = await expense.aggregate([
+  const previousMonthExpenseCategory = await expense.aggregate([
     {
       $match: {
         user: req.userInfo._id,
@@ -74,7 +76,7 @@ router.get("/user/getHome", auth.verifyUser, async (req, res) => {
     },
   ]);
 
-  const previousMonthIncomeAmount = await income.aggregate([
+  const previousMonthIncomeCategory = await income.aggregate([
     {
       $match: {
         user: req.userInfo._id,
@@ -85,6 +87,15 @@ router.get("/user/getHome", auth.verifyUser, async (req, res) => {
       $group: { _id: null, amount: { $sum: "$amount" } },
     },
   ]);
+
+  const previousMonthExpenseAmount =
+    previousMonthExpenseCategory.length == 0
+      ? 0
+      : previousMonthExpenseCategory[0].amount;
+  const previousMonthIncomeAmount =
+    previousMonthIncomeCategory.length == 0
+      ? 0
+      : previousMonthIncomeCategory[0].amount;
 
   const month1 = [4, 6, 9, 11];
   const month2 = [1, 3, 5, 7, 8, 10, 12];
@@ -107,22 +118,23 @@ router.get("/user/getHome", auth.verifyUser, async (req, res) => {
   );
 
   const previousMonthExpenseRate = parseFloat(
-    (previousMonthExpenseAmount[0].amount / previousMonthDays).toFixed(2)
+    (previousMonthExpenseAmount / previousMonthDays).toFixed(2)
   );
-
+  
   const previousMonthIncomeRate = parseFloat(
-    (previousMonthIncomeAmount[0].amount / previousMonthDays).toFixed(2)
+    (previousMonthIncomeAmount / previousMonthDays).toFixed(2)
   );
-
   res.send({
     thisMonthExpenses: thisMonthExpenses,
     thisMonthIncomes: thisMonthIncomes,
     thisMonthExpenseAmount: thisMonthExpenseAmount,
     thisMonthIncomeAmount: thisMonthIncomeAmount,
+    previousMonthExpenseAmount: previousMonthExpenseAmount,
+    previousMonthIncomeAmount: previousMonthIncomeAmount,
     maxExpenseCategory: maxExpenseCategory,
     maxIncomeCategory: maxIncomeCategory,
-    previousMonthExpenseAmount: previousMonthExpenseAmount[0].amount,
-    previousMonthIncomeAmount: previousMonthIncomeAmount[0].amount,
+    thisMonthExpenseCategories: thisMonthExpenseCategories,
+    thisMonthIncomeCategories: thisMonthIncomeCategories,
     thisMonthExpenseRate: thisMonthExpenseRate,
     thisMonthIncomeRate: thisMonthIncomeRate,
     previousMonthExpenseRate: previousMonthExpenseRate,

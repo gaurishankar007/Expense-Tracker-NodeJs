@@ -177,9 +177,14 @@ router.get("/expense/getDWM", auth.verifyUser, async (req, res) => {
     .findOne({ user: req.userInfo._id })
     .sort({ createdAt: 1 });
 
+  const firstExpenseDate =
+    firstExpense === null
+      ? currentDateTime.toISOString().split("T")[0]
+      : firstExpense.createdAt.toISOString().split("T")[0];
+
   res.send({
     profilePicture: req.userInfo.profilePicture,
-    firstExpenseDate: firstExpense.createdAt.toISOString().split("T")[0],
+    firstExpenseDate: firstExpenseDate,
     todayExpenses: todayExpenses,
     thisWeekExpenses: thisWeekExpenses,
     thisMonthExpenses: thisMonthExpenses,

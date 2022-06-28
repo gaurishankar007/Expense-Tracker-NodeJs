@@ -670,9 +670,9 @@ class _IncomeState extends State<Income> {
             child: Row(
               children: [
                 Text(
-                  "Income Categories:",
+                  "Income Categories",
                   style: TextStyle(
-                    fontSize: 17,
+                    fontSize: 18,
                     color: AppColors.text,
                     fontWeight: FontWeight.bold,
                   ),
@@ -798,9 +798,9 @@ class _IncomeState extends State<Income> {
           Row(
             children: [
               Text(
-                "Income Items:",
+                "Income Items",
                 style: TextStyle(
-                  fontSize: 17,
+                  fontSize: 18,
                   color: AppColors.text,
                   fontWeight: FontWeight.bold,
                 ),

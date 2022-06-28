@@ -16,7 +16,7 @@ class ExpenseCategoryColors {
     Color(0XFF8D67AB),
     Color(0XFF148A08),
     Color(0XFFE61E32),
-    Color.fromARGB(255, 10, 73, 55),
+    Color(0xFF0A4937),
     Color(0XFFE8115B),
     Color(0XFF1E3264),
     Color(0XFF0D73EC),
