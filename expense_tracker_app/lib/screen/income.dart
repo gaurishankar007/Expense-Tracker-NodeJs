@@ -410,9 +410,7 @@ class _IncomeState extends State<Income> {
                                       "Search",
                                     ),
                                     style: ElevatedButton.styleFrom(
-                                      primary: incomeIndex == 3
-                                          ? AppColors.primary
-                                          : AppColors.button,
+                                      primary: AppColors.primary,
                                       minimumSize: Size.zero,
                                       padding: EdgeInsets.symmetric(
                                         horizontal: 10,

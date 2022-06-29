@@ -202,16 +202,16 @@ router.post("/expense/getSpecific", auth.verifyUser, async (req, res) => {
   const eDate = req.body.endDate;
 
   if (sDate.trim() === "" || eDate.trim() === "") {
-    return res.send({ resM: "Provide both start and end date." });
+    return res.status(400).send({ resM: "Provide both start and end date." });
   }
 
   const currentDateTime = new Date();
 
-  startDate = new Date(
+  const startDate = new Date(
     new Date(sDate).getTime() + currentDateTime.getTimezoneOffset() * 60 * 1000
   );
 
-  endDate = new Date(
+  const endDate = new Date(
     new Date(eDate).getTime() + currentDateTime.getTimezoneOffset() * 60 * 1000
   );
 
@@ -252,13 +252,13 @@ router.post("/expense/getSpecific", auth.verifyUser, async (req, res) => {
   });
 });
 
-router.delete("/expense/remove", (req, res) => {
+router.delete("/expense/remove", auth.verifyUser, (req, res) => {
   expense.findOneAndDelete({ _id: req.body.expenseId }).then(() => {
     res.send({ resM: "Expense removed." });
   });
 });
 
-router.put("/expense/edit", (req, res) => {
+router.put("/expense/edit", auth.verifyUser, (req, res) => {
   const expenseId = req.body.expenseId;
   const name = req.body.name;
   const amount = req.body.amount;
@@ -296,5 +296,104 @@ router.put("/expense/edit", (req, res) => {
       res.send({ resM: "Expense edited." });
     });
 });
+
+router.post("/expense/categorized", auth.verifyUser, async (req, res) => {
+  const category = req.body.category;
+
+  if (category.trim() === "") {
+    return res.send({ resM: "Provide expense category." });
+  }
+
+  const currentDateTime = new Date();
+
+  const thisMonth = new Date(
+    new Date(
+      currentDateTime.toISOString().split("T")[0].split("-")[0] +
+        "-" +
+        currentDateTime.toISOString().split("T")[0].split("-")[1] +
+        "-01"
+    ).getTime() +
+      currentDateTime.getTimezoneOffset() * 60 * 1000
+  );
+
+  const thisMonthExpenses = await expense
+    .find({
+      user: req.userInfo._id,
+      category: category,
+      createdAt: { $gte: thisMonth },
+    })
+    .sort({ amount: -1 });
+
+  res.send(thisMonthExpenses);
+});
+
+router.post(
+  "/expense/categorizedSpecific",
+  auth.verifyUser,
+  async (req, res) => {
+    const category = req.body.category;
+    const sDate = req.body.startDate;
+    const eDate = req.body.endDate;
+
+    if (category.trim() === "" || sDate.trim() === "" || eDate.trim() === "") {
+      return res
+        .status(400)
+        .send({ resM: "Provide both start and end date along with category." });
+    }
+
+    const currentDateTime = new Date();
+
+    const startDate = new Date(
+      new Date(sDate).getTime() +
+        currentDateTime.getTimezoneOffset() * 60 * 1000
+    );
+
+    const endDate = new Date(
+      new Date(eDate).getTime() +
+        currentDateTime.getTimezoneOffset() * 60 * 1000
+    );
+
+    const thisMonthExpenses = await expense
+      .find({
+        user: req.userInfo._id,
+        category: category,
+        createdAt: {
+          $gte: startDate,
+          $lte: endDate,
+        },
+      })
+      .sort({ amount: -1 });
+
+    res.send(thisMonthExpenses);
+  }
+);
+
+router.post(
+  "/expense/getCategoryStartDate",
+  auth.verifyUser,
+  async (req, res) => {
+    const category = req.body.category;
+
+    if (category.trim() === "") {
+      return res.send({ resM: "Provide expense category." });
+    }
+
+    const firstExpenseCategory = await expense
+      .findOne({
+        user: req.userInfo._id,
+        category: category,
+      })
+      .sort({ createdAt: 1 });
+
+    const currentDateTime = new Date();
+
+    const startDate =
+      firstExpenseCategory === null
+        ? currentDateTime.toISOString().split("T")[0]
+        : firstExpenseCategory.createdAt.toISOString().split("T")[0];
+
+    res.send(startDate);
+  }
+);
 
 module.exports = router;

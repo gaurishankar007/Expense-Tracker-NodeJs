@@ -412,9 +412,7 @@ class _ExpenseState extends State<Expense> {
                                       "Search",
                                     ),
                                     style: ElevatedButton.styleFrom(
-                                      primary: expenseIndex == 3
-                                          ? AppColors.primary
-                                          : AppColors.button,
+                                      primary: AppColors.primary,
                                       minimumSize: Size.zero,
                                       padding: EdgeInsets.symmetric(
                                         horizontal: 10,

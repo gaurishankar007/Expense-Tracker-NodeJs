@@ -1,7 +1,6 @@
 const express = require("express");
 const router = new express.Router();
 const auth = require("../authentication/auth");
-const user = require("../model/userModel");
 const expense = require("../model/expenseModel");
 const income = require("../model/incomeModel");
 
@@ -18,17 +17,44 @@ router.get("/user/getHome", auth.verifyUser, async (req, res) => {
       currentDateTime.getTimezoneOffset() * 60 * 1000
   );
 
+  const currentDay = parseInt(
+    currentDateTime.toISOString().split("T")[0].split("-")[2]
+  );
+
   const previousMonth = new Date(thisMonth.getTime() - 2592000000);
 
-  const thisMonthExpenses = await expense.find({
-    user: req.userInfo._id,
-    createdAt: { $gte: thisMonth },
-  });
+  const thisMonthExpenses = await expense
+    .find({
+      user: req.userInfo._id,
+      createdAt: { $gte: thisMonth },
+    })
+    .sort({ createdAt: 1 });
 
-  const thisMonthIncomes = await income.find({
-    user: req.userInfo._id,
-    createdAt: { $gte: thisMonth },
-  });
+  const expenseDays = [];
+  const expenseAmounts = [];
+
+  for (let i = 0; i < thisMonthExpenses.length; i++) {
+    const day = parseInt(
+      thisMonthExpenses[i].createdAt.toISOString().split("T")[0].split("-")[2]
+    );
+
+    if (!expenseDays.includes(day)) {
+      expenseDays.push(day);
+      expenseAmounts.push(thisMonthExpenses[i].amount);
+    } else {
+      const newIndex = expenseDays.indexOf(day);
+      const newExpenseAmount =
+        expenseAmounts[newIndex] + thisMonthExpenses[i].amount;
+      expenseAmounts[newIndex] = newExpenseAmount;
+    }
+  }
+
+  var maxExpenseAmount = 0;
+  for (let i = 0; i < expenseAmounts.length; i++) {
+    if (expenseAmounts[i] > maxExpenseAmount) {
+      maxExpenseAmount = expenseAmounts[i];
+    }
+  }
 
   var thisMonthExpenseAmount = 0;
   const maxExpenseCategory = { _id: "Nan", amount: -1 };
@@ -120,13 +146,15 @@ router.get("/user/getHome", auth.verifyUser, async (req, res) => {
   const previousMonthExpenseRate = parseFloat(
     (previousMonthExpenseAmount / previousMonthDays).toFixed(2)
   );
-  
+
   const previousMonthIncomeRate = parseFloat(
     (previousMonthIncomeAmount / previousMonthDays).toFixed(2)
   );
   res.send({
-    thisMonthExpenses: thisMonthExpenses,
-    thisMonthIncomes: thisMonthIncomes,
+    currentDay: currentDay,
+    expenseDays: expenseDays,
+    expenseAmounts: expenseAmounts,
+    maxExpenseAmount: maxExpenseAmount,
     thisMonthExpenseAmount: thisMonthExpenseAmount,
     thisMonthIncomeAmount: thisMonthIncomeAmount,
     previousMonthExpenseAmount: previousMonthExpenseAmount,

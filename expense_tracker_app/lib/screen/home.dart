@@ -2,6 +2,8 @@ import 'package:expense_tracker/api/http/home_http.dart';
 import 'package:expense_tracker/api/res/expense_res.dart';
 import 'package:expense_tracker/api/res/home_res.dart';
 import 'package:expense_tracker/resource/category.dart';
+import 'package:expense_tracker/screen/categorized_expense.dart';
+import 'package:expense_tracker/screen/categorized_income.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -112,43 +114,46 @@ class _HomeState extends State<Home> {
         child: SingleChildScrollView(
           padding: EdgeInsets.only(
             top: 10,
-            right: sWidth * 0.03,
             bottom: 10,
-            left: sWidth * 0.03,
           ),
           child: Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    greeting,
-                    style: TextStyle(
-                      color: AppColors.text,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: sWidth * 0.03,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      greeting,
+                      style: TextStyle(
+                        color: AppColors.text,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  IconButton(
-                    constraints: BoxConstraints(),
-                    padding: EdgeInsets.zero,
-                    icon: Icon(
-                      Icons.settings,
-                      color: AppColors.primary,
+                    IconButton(
+                      constraints: BoxConstraints(),
+                      padding: EdgeInsets.zero,
+                      icon: Icon(
+                        Icons.settings,
+                        color: AppColors.primary,
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (builder) => Setting(),
+                          ),
+                        );
+                      },
                     ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (builder) => Setting(),
-                        ),
-                      );
-                    },
-                  ),
-                ],
+                  ],
+                ),
               ),
               SizedBox(
-                height: 20,
+                height: 10,
               ),
               FutureBuilder<HomeData>(
                 future: userHomeData,
@@ -169,11 +174,38 @@ class _HomeState extends State<Home> {
                   } else {
                     if (snapshot.hasData) {
                       children = <Widget>[
-                        expenseIncomeLineChart(
-                          context,
-                          snapshot.data!.thisMonthExpenses!,
-                          snapshot.data!.thisMonthIncomes!,
-                        ),
+                        snapshot.data!.expenseDays!.length > 1
+                            ? Column(
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: sWidth * 0.03,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          "This Month Expenses",
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            color: AppColors.text,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  expenseLineChart(
+                                    context,
+                                    snapshot.data!.maxExpenseAmount!,
+                                    snapshot.data!.expenseDays!,
+                                    snapshot.data!.expenseAmounts!,
+                                  ),
+                                ],
+                              )
+                            : SizedBox(),
                         SizedBox(
                           height: 10,
                         ),
@@ -220,9 +252,19 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget expenseIncomeLineChart(BuildContext context,
-      List<ExpenseData> expenses, List<IncomeData> incomes) {
+  Widget expenseLineChart(
+    BuildContext context,
+    int maxExpenseAmount,
+    List<int> expenseDays,
+    List<int> expenseAmounts,
+  ) {
     final sWidth = MediaQuery.of(context).size.width;
+    List<FlSpot> expenseLineData = [];
+
+    for (int i = 0; i < expenseDays.length; i++) {
+      expenseLineData.add(FlSpot(expenseDays[i].toDouble(),
+          (expenseAmounts[i] / maxExpenseAmount) * 5));
+    }
 
     return SizedBox(
       height: 200,
@@ -232,14 +274,91 @@ class _HomeState extends State<Home> {
           lineTouchData: LineTouchData(
             handleBuiltInTouches: true,
             touchTooltipData: LineTouchTooltipData(
-              tooltipBgColor: Colors.white,
-              tooltipRoundedRadius: 2,
-            ),
+                tooltipBgColor: AppColors.primary,
+                tooltipRoundedRadius: 5,
+                getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
+                  return touchedBarSpots.map((barSpot) {
+                    final flSpot = barSpot;
+                    if (flSpot.x == 0 || flSpot.x == 6) {
+                      return null;
+                    }
+
+                    return LineTooltipItem(
+                      "Rs. ${((flSpot.y / 5) * maxExpenseAmount).round()}",
+                      const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    );
+                  }).toList();
+                }),
           ),
           gridData: FlGridData(
-            show: false,
+            show: true,
+            drawVerticalLine: true,
+            horizontalInterval: 1,
+            verticalInterval: 1,
+            getDrawingHorizontalLine: (value) {
+              return FlLine(
+                color: Color(0xFFAAAEB1),
+                strokeWidth: 1,
+              );
+            },
+            getDrawingVerticalLine: (value) {
+              return FlLine(
+                color: Color(0xFFAAAEB1),
+                strokeWidth: 1,
+              );
+            },
           ),
           titlesData: FlTitlesData(
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                interval: 1,
+                reservedSize: 25,
+                getTitlesWidget: (double value, TitleMeta meta) {
+                  TextStyle style = TextStyle(
+                    color: AppColors.text,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 8,
+                  );
+                  String text = "";
+                  String amount1 = (maxExpenseAmount / 5000) > 0.1
+                      ? (maxExpenseAmount / 5000).toStringAsFixed(1) + "k"
+                      : (maxExpenseAmount / 5000).toStringAsFixed(2) + "k";
+                  String amount2 = ((maxExpenseAmount / 5000) * 2) > 0.1
+                      ? ((maxExpenseAmount / 5000) * 2).toStringAsFixed(1) + "k"
+                      : ((maxExpenseAmount / 5000) * 2).toStringAsFixed(2) +
+                          "k";
+                  String amount3 = ((maxExpenseAmount / 5000) * 3) > 0.1
+                      ? ((maxExpenseAmount / 5000) * 3).toStringAsFixed(1) + "k"
+                      : ((maxExpenseAmount / 5000) * 3).toStringAsFixed(2) +
+                          "k";
+                  String amount4 = ((maxExpenseAmount / 5000) * 4) > 0.1
+                      ? ((maxExpenseAmount / 5000) * 4).toStringAsFixed(1) + "k"
+                      : ((maxExpenseAmount / 5000) * 4).toStringAsFixed(2) +
+                          "k";
+                  String amount5 = (maxExpenseAmount / 1000) > 0.1
+                      ? (maxExpenseAmount / 1000).toStringAsFixed(1) + "k"
+                      : (maxExpenseAmount / 1000).toStringAsFixed(2) + "k";
+
+                  if (value.toInt() == 1) {
+                    text = amount1;
+                  } else if (value.toInt() == 2) {
+                    text = amount2;
+                  } else if (value.toInt() == 3) {
+                    text = amount3;
+                  } else if (value.toInt() == 4) {
+                    text = amount4;
+                  } else if (value.toInt() == 5) {
+                    text = amount5;
+                  }
+
+                  return Text(text, style: style, textAlign: TextAlign.center);
+                },
+              ),
+            ),
             rightTitles: AxisTitles(
               sideTitles: SideTitles(showTitles: false),
             ),
@@ -247,50 +366,22 @@ class _HomeState extends State<Home> {
               sideTitles: SideTitles(showTitles: false),
             ),
             bottomTitles: AxisTitles(
-              axisNameWidget: Text(
-                "Day",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              axisNameSize: 25,
               sideTitles: SideTitles(
                 showTitles: true,
-                reservedSize: 25,
+                reservedSize: 15,
                 interval: 1,
                 getTitlesWidget: (double value, TitleMeta meta) {
                   TextStyle style = TextStyle(
                     color: AppColors.text,
                     fontWeight: FontWeight.bold,
-                    fontSize: 14,
+                    fontSize: 7,
                   );
-                  Widget text;
-                  switch (value.toInt()) {
-                    case 0:
-                      text = Text('1', style: style);
-                      break;
-                    case 1:
-                      text = Text('2', style: style);
-                      break;
-                    case 2:
-                      text = Text('3', style: style);
-                      break;
-                    case 3:
-                      text = Text('4', style: style);
-                      break;
-                    case 4:
-                      text = Text('5', style: style);
-                      break;
-                    case 5:
-                      text = Text('6', style: style);
-                      break;
-                    case 6:
-                      text = Text('7', style: style);
-                      break;
-                    default:
-                      text = const Text('');
-                      break;
+                  Widget text = Text("");
+
+                  for (int i = 0; i < 31; i++) {
+                    if (value.toInt() == i) {
+                      text = Text((i + 1).toString(), style: style);
+                    }
                   }
 
                   return SideTitleWidget(
@@ -301,52 +392,16 @@ class _HomeState extends State<Home> {
                 },
               ),
             ),
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                interval: 1,
-                reservedSize: 40,
-                getTitlesWidget: (double value, TitleMeta meta) {
-                  TextStyle style = TextStyle(
-                    color: AppColors.text,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  );
-                  String text;
-                  switch (value.toInt()) {
-                    case 1:
-                      text = '1m';
-                      break;
-                    case 2:
-                      text = '2m';
-                      break;
-                    case 3:
-                      text = '3m';
-                      break;
-                    case 4:
-                      text = '5m';
-                      break;
-                    case 5:
-                      text = '6m';
-                      break;
-                    default:
-                      return Container();
-                  }
-
-                  return Text(text, style: style, textAlign: TextAlign.center);
-                },
-              ),
-            ),
           ),
           borderData: FlBorderData(
             show: true,
             border: Border(
               bottom: BorderSide(
-                color: AppColors.text,
-                width: 4,
+                color: AppColors.primary,
+                width: 3,
               ),
               left: BorderSide(
-                color: AppColors.text,
+                color: AppColors.primary,
                 width: 3,
               ),
               right: BorderSide(color: Colors.transparent),
@@ -356,46 +411,20 @@ class _HomeState extends State<Home> {
           lineBarsData: [
             LineChartBarData(
               isCurved: true,
-              color: Colors.green,
-              barWidth: 2,
+              color: Colors.red,
+              barWidth: 1,
               isStrokeCapRound: true,
               dotData: FlDotData(show: true),
               belowBarData: BarAreaData(
                 show: true,
-                color: Color(0xFF88F1BE),
+                color: Color(0xFFF08F88),
               ),
-              spots: const [
-                FlSpot(0, 1),
-                FlSpot(3, 1.5),
-                FlSpot(5, 1.4),
-                FlSpot(7, 3.4),
-                FlSpot(10, 2),
-                FlSpot(12, 2.2),
-                FlSpot(13, 1.8),
-              ],
-            ),
-            LineChartBarData(
-              isCurved: true,
-              color: Colors.red,
-              barWidth: 2,
-              isStrokeCapRound: true,
-              dotData: FlDotData(show: true),
-              belowBarData: BarAreaData(
-                show: false,
-              ),
-              spots: const [
-                FlSpot(1, 1),
-                FlSpot(3, 2.8),
-                FlSpot(7, 1.2),
-                FlSpot(10, 2.8),
-                FlSpot(12, 2.6),
-                FlSpot(13, 3.9),
-              ],
+              spots: expenseLineData,
             ),
           ],
           minX: 0,
-          maxX: 14,
-          maxY: 4,
+          maxX: 31,
+          maxY: 5,
           minY: 0,
         ),
         swapAnimationDuration: const Duration(milliseconds: 250),
@@ -403,428 +432,619 @@ class _HomeState extends State<Home> {
     );
   }
 
+  Widget shortNote(BuildContext context) {
+    return SimpleDialog(
+      children: [
+        SimpleDialogOption(
+          padding: EdgeInsets.symmetric(
+            vertical: 5,
+            horizontal: 20,
+          ),
+          child: RichText(
+            text: TextSpan(
+              text: "ExD: ",
+              style: TextStyle(
+                fontSize: 16,
+                color: AppColors.primary,
+                fontWeight: FontWeight.bold,
+              ),
+              children: [
+                TextSpan(
+                  text: "Expense amount spend per day in a month.",
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: AppColors.text,
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        SimpleDialogOption(
+          padding: EdgeInsets.symmetric(
+            vertical: 5,
+            horizontal: 20,
+          ),
+          child: RichText(
+            text: TextSpan(
+              text: "InD: ",
+              style: TextStyle(
+                fontSize: 16,
+                color: AppColors.primary,
+                fontWeight: FontWeight.bold,
+              ),
+              children: [
+                TextSpan(
+                  text: "Income amount earned per day in a month.",
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: AppColors.text,
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        SimpleDialogOption(
+          padding: EdgeInsets.symmetric(
+            vertical: 5,
+            horizontal: 20,
+          ),
+          child: RichText(
+            text: TextSpan(
+              text: "MxEC: ",
+              style: TextStyle(
+                fontSize: 16,
+                color: AppColors.primary,
+                fontWeight: FontWeight.bold,
+              ),
+              children: [
+                TextSpan(
+                  text:
+                      "The expense category which contains maximum expenses this month.",
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: AppColors.text,
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        SimpleDialogOption(
+          padding: EdgeInsets.symmetric(
+            vertical: 5,
+            horizontal: 20,
+          ),
+          child: RichText(
+            text: TextSpan(
+              text: "MxIC: ",
+              style: TextStyle(
+                fontSize: 16,
+                color: AppColors.primary,
+                fontWeight: FontWeight.bold,
+              ),
+              children: [
+                TextSpan(
+                  text:
+                      "The income category which contains maximum incomes this month.",
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: AppColors.text,
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget feedback(BuildContext context, HomeData homeData) {
     final sWidth = MediaQuery.of(context).size.width;
 
-    if (homeData.thisMonthExpenses!.isEmpty) {
+    if (homeData.thisMonthExpenseAmount! == 0 &&
+        homeData.thisMonthIncomeAmount! == 0) {
       return SizedBox();
     }
 
-    return Column(
-      children: [
-        Row(
-          children: [
-            Icon(
-              Icons.date_range_rounded,
-              color: AppColors.primary,
-              size: 30,
-            ),
-            SizedBox(
-              width: 5,
-            ),
-            Text(
-              "${months[(int.parse(DateTime.now().month.toString())) - 1]} ${DateTime.now().year.toString()}",
-              style: TextStyle(
-                fontSize: 18,
-                color: AppColors.text,
-                fontWeight: FontWeight.bold,
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: sWidth * 0.03,
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.date_range_rounded,
+                color: AppColors.primary,
+                size: 30,
               ),
-            ),
-          ],
-        ),
-        SizedBox(
-          height: 5,
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            SizedBox(
-              width: sWidth * .45,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.money_off_csred_rounded,
-                          color: Colors.red,
-                          size: 25,
-                        ),
-                        Text(
-                          "Rs. ${homeData.thisMonthExpenseAmount!}",
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: AppColors.text,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 8,
-                    ),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.money_off_csred_rounded,
-                          color: Colors.red,
-                          size: 25,
-                        ),
-                        Text(
-                          "Rs. ${homeData.thisMonthExpenseRate!} ExD",
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: AppColors.text,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 8,
-                    ),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.money_off_csred_rounded,
-                          color: Colors.red,
-                          size: 25,
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Rs. ${homeData.maxExpenseCategory!.amount}",
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: AppColors.text,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Text(
-                              "${homeData.maxExpenseCategory!.category} MxEC",
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: AppColors.text,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
+              SizedBox(
+                width: 5,
+              ),
+              Text(
+                "${months[(int.parse(DateTime.now().month.toString())) - 1]} ${DateTime.now().year.toString()}",
+                style: TextStyle(
+                  fontSize: 18,
+                  color: AppColors.text,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            ),
-            SizedBox(
-              width: sWidth * .45,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.attach_money_rounded,
-                          color: Colors.green,
-                          size: 25,
-                        ),
-                        Text(
-                          "Rs. ${homeData.thisMonthIncomeAmount!}",
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: AppColors.text,
-                            fontWeight: FontWeight.bold,
+            ],
+          ),
+          SizedBox(
+            height: 5,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                width: sWidth * .45,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.money_off_csred_rounded,
+                            color: Colors.red,
+                            size: 25,
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 8,
-                    ),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.attach_money_rounded,
-                          color: Colors.green,
-                          size: 25,
-                        ),
-                        Text(
-                          "Rs. ${homeData.thisMonthIncomeRate!} InD",
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: AppColors.text,
-                            fontWeight: FontWeight.bold,
+                          Text(
+                            "Rs. ${homeData.thisMonthExpenseAmount!}",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: AppColors.text,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 8,
-                    ),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.attach_money_rounded,
-                          color: Colors.green,
-                          size: 25,
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Rs. ${homeData.maxIncomeCategory!.amount}",
+                        ],
+                      ),
+                      SizedBox(
+                        height: 8,
+                      ),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.money_off_csred_rounded,
+                            color: Colors.red,
+                            size: 25,
+                          ),
+                          Text(
+                            "Rs. ${homeData.thisMonthExpenseRate!} ",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: AppColors.text,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (ctx) => shortNote(context),
+                              );
+                            },
+                            child: Text(
+                              "ExD",
                               style: TextStyle(
                                 fontSize: 14,
-                                color: AppColors.text,
+                                color: AppColors.primary,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Text(
-                              "${homeData.maxIncomeCategory!.category} MxIC",
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: AppColors.text,
-                                fontWeight: FontWeight.bold,
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 8,
+                      ),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.money_off_csred_rounded,
+                            color: Colors.red,
+                            size: 25,
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Rs. ${homeData.maxExpenseCategory!.amount}",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: AppColors.text,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    "${homeData.maxExpenseCategory!.category} ",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: AppColors.text,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (ctx) => shortNote(context),
+                                      );
+                                    },
+                                    child: Text(
+                                      "MxEC",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: AppColors.primary,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
-        SizedBox(
-          height: 5,
-        ),
-        homeData.thisMonthExpenseAmount! < homeData.thisMonthIncomeAmount!
-            ? Padding(
-                padding: const EdgeInsets.only(top: 5),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.check_box_rounded,
-                      color: Colors.green,
-                      size: 25,
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    SizedBox(
-                      width: sWidth * .8,
-                      child: Text(
-                        "Expense is less than income.",
-                        textAlign: TextAlign.justify,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: AppColors.text,
-                          fontWeight: FontWeight.bold,
+              SizedBox(
+                width: sWidth * .45,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.attach_money_rounded,
+                            color: Colors.green,
+                            size: 25,
+                          ),
+                          Text(
+                            "Rs. ${homeData.thisMonthIncomeAmount!}",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: AppColors.text,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 8,
+                      ),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.attach_money_rounded,
+                            color: Colors.green,
+                            size: 25,
+                          ),
+                          Text(
+                            "Rs. ${homeData.thisMonthIncomeRate!} ",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: AppColors.text,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (ctx) => shortNote(context),
+                              );
+                            },
+                            child: Text(
+                              "InD",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 8,
+                      ),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.attach_money_rounded,
+                            color: Colors.green,
+                            size: 25,
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Rs. ${homeData.maxIncomeCategory!.amount}",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: AppColors.text,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    "${homeData.maxIncomeCategory!.category} ",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: AppColors.text,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (ctx) => shortNote(context),
+                                      );
+                                    },
+                                    child: Text(
+                                      "MxIC",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: AppColors.primary,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(
+            height: 5,
+          ),
+          homeData.thisMonthExpenseAmount! < homeData.thisMonthIncomeAmount!
+              ? Padding(
+                  padding: const EdgeInsets.only(top: 5),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.check_box_rounded,
+                        color: Colors.green,
+                        size: 25,
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      SizedBox(
+                        width: sWidth * .8,
+                        child: Text(
+                          "Expense is less than income.",
+                          textAlign: TextAlign.justify,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppColors.text,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              )
-            : SizedBox(),
-        homeData.previousMonthExpenseAmount! != 0 &&
-                homeData.thisMonthExpenseRate! <
-                    homeData.previousMonthExpenseRate!
-            ? Padding(
-                padding: const EdgeInsets.only(top: 5),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.check_box_rounded,
-                      color: Colors.green,
-                      size: 25,
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    SizedBox(
-                      width: sWidth * .8,
-                      child: Text(
-                        "Expense amount per day (ExD) is less than previous month (Rs. ${homeData.previousMonthExpenseRate} ExD).",
-                        textAlign: TextAlign.justify,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: AppColors.text,
-                          fontWeight: FontWeight.bold,
+                    ],
+                  ),
+                )
+              : SizedBox(),
+          homeData.previousMonthExpenseAmount! != 0 &&
+                  homeData.thisMonthExpenseRate! <
+                      homeData.previousMonthExpenseRate!
+              ? Padding(
+                  padding: const EdgeInsets.only(top: 5),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.check_box_rounded,
+                        color: Colors.green,
+                        size: 25,
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      SizedBox(
+                        width: sWidth * .8,
+                        child: Text(
+                          "Expense amount per day (ExD) is less than previous month (Rs. ${homeData.previousMonthExpenseRate} ExD).",
+                          textAlign: TextAlign.justify,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppColors.text,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              )
-            : SizedBox(),
-        homeData.previousMonthIncomeAmount! != 0 &&
-                homeData.thisMonthIncomeAmount! >
-                    homeData.previousMonthIncomeAmount!
-            ? Padding(
-                padding: const EdgeInsets.only(top: 5),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.check_box_rounded,
-                      color: Colors.green,
-                      size: 25,
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    SizedBox(
-                      width: sWidth * .8,
-                      child: Text(
-                        "Income is greater than previous month (Rs. ${homeData.previousMonthIncomeAmount}).",
-                        textAlign: TextAlign.justify,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: AppColors.text,
-                          fontWeight: FontWeight.bold,
+                    ],
+                  ),
+                )
+              : SizedBox(),
+          homeData.previousMonthIncomeAmount! != 0 &&
+                  homeData.thisMonthIncomeAmount! >
+                      homeData.previousMonthIncomeAmount!
+              ? Padding(
+                  padding: const EdgeInsets.only(top: 5),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.check_box_rounded,
+                        color: Colors.green,
+                        size: 25,
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      SizedBox(
+                        width: sWidth * .8,
+                        child: Text(
+                          "Income is greater than previous month (Rs. ${homeData.previousMonthIncomeAmount}).",
+                          textAlign: TextAlign.justify,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppColors.text,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              )
-            : SizedBox(),
-        homeData.previousMonthIncomeAmount! != 0 &&
-                homeData.thisMonthIncomeRate! >
-                    homeData.previousMonthIncomeRate!
-            ? Padding(
-                padding: const EdgeInsets.only(top: 5),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.check_box_rounded,
-                      color: Colors.green,
-                      size: 25,
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    SizedBox(
-                      width: sWidth * .8,
-                      child: Text(
-                        "Income amount per day (InD) is greater than previous month (Rs. ${homeData.previousMonthIncomeRate} InD).",
-                        textAlign: TextAlign.justify,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: AppColors.text,
-                          fontWeight: FontWeight.bold,
+                    ],
+                  ),
+                )
+              : SizedBox(),
+          homeData.previousMonthIncomeAmount! != 0 &&
+                  homeData.thisMonthIncomeRate! >
+                      homeData.previousMonthIncomeRate!
+              ? Padding(
+                  padding: const EdgeInsets.only(top: 5),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.check_box_rounded,
+                        color: Colors.green,
+                        size: 25,
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      SizedBox(
+                        width: sWidth * .8,
+                        child: Text(
+                          "InD is greater than previous month (Rs. ${homeData.previousMonthIncomeRate} InD).",
+                          textAlign: TextAlign.justify,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppColors.text,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              )
-            : SizedBox(),
-        homeData.thisMonthExpenseAmount! > homeData.thisMonthIncomeAmount!
-            ? Padding(
-                padding: const EdgeInsets.only(top: 5),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.check_box_rounded,
-                      color: Colors.red,
-                      size: 25,
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    SizedBox(
-                      width: sWidth * .8,
-                      child: Text(
-                        "Expense is greater than income this month",
-                        textAlign: TextAlign.justify,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: AppColors.text,
-                          fontWeight: FontWeight.bold,
+                    ],
+                  ),
+                )
+              : SizedBox(),
+          homeData.thisMonthExpenseAmount! > homeData.thisMonthIncomeAmount!
+              ? Padding(
+                  padding: const EdgeInsets.only(top: 5),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.warning_amber_rounded,
+                        color: Colors.red,
+                        size: 25,
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      SizedBox(
+                        width: sWidth * .8,
+                        child: Text(
+                          "Expense is greater than income this month",
+                          textAlign: TextAlign.justify,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppColors.text,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              )
-            : SizedBox(),
-        homeData.previousMonthExpenseAmount! != 0 &&
-                homeData.thisMonthExpenseAmount! >
-                    homeData.previousMonthExpenseAmount!
-            ? Padding(
-                padding: const EdgeInsets.only(top: 5),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.check_box_rounded,
-                      color: Colors.orange,
-                      size: 25,
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    SizedBox(
-                      width: sWidth * .8,
-                      child: Text(
-                        "Expense is greater than previous month (Rs. ${homeData.previousMonthExpenseAmount})",
-                        textAlign: TextAlign.justify,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: AppColors.text,
-                          fontWeight: FontWeight.bold,
+                    ],
+                  ),
+                )
+              : SizedBox(),
+          homeData.previousMonthExpenseAmount! != 0 &&
+                  homeData.thisMonthExpenseAmount! >
+                      homeData.previousMonthExpenseAmount!
+              ? Padding(
+                  padding: const EdgeInsets.only(top: 5),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.warning_amber_rounded,
+                        color: Colors.orange,
+                        size: 25,
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      SizedBox(
+                        width: sWidth * .8,
+                        child: Text(
+                          "Expense is greater than previous month (Rs. ${homeData.previousMonthExpenseAmount})",
+                          textAlign: TextAlign.justify,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppColors.text,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              )
-            : SizedBox(),
-        homeData.previousMonthExpenseAmount! != 0 &&
-                homeData.thisMonthExpenseAmount! >
-                    homeData.previousMonthExpenseAmount!
-            ? Padding(
-                padding: const EdgeInsets.only(top: 5),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.check_box_rounded,
-                      color: Colors.orange,
-                      size: 25,
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    SizedBox(
-                      width: sWidth * .8,
-                      child: Text(
-                        "Expense amount per day is greater than previous month (Rs. ${homeData.previousMonthExpenseRate} ExD)",
-                        textAlign: TextAlign.justify,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: AppColors.text,
-                          fontWeight: FontWeight.bold,
+                    ],
+                  ),
+                )
+              : SizedBox(),
+          homeData.previousMonthExpenseAmount! != 0 &&
+                  homeData.thisMonthExpenseAmount! >
+                      homeData.previousMonthExpenseAmount!
+              ? Padding(
+                  padding: const EdgeInsets.only(top: 5),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.warning_amber_rounded,
+                        color: Colors.orange,
+                        size: 25,
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      SizedBox(
+                        width: sWidth * .8,
+                        child: Text(
+                          "ExD is greater than previous month (Rs. ${homeData.previousMonthExpenseRate} ExD)",
+                          textAlign: TextAlign.justify,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppColors.text,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              )
-            : SizedBox()
-      ],
+                    ],
+                  ),
+                )
+              : SizedBox()
+        ],
+      ),
     );
   }
 
@@ -833,128 +1053,143 @@ class _HomeState extends State<Home> {
     final sWidth = MediaQuery.of(context).size.width;
     final sHeight = MediaQuery.of(context).size.height;
 
-    return Column(
-      children: [
-        Row(
-          children: [
-            Text(
-              "Expense Categories",
-              style: TextStyle(
-                fontSize: 18,
-                color: AppColors.text,
-                fontWeight: FontWeight.bold,
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: sWidth * 0.03,
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Text(
+                "Expense Categories",
+                style: TextStyle(
+                  fontSize: 18,
+                  color: AppColors.text,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-          ],
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        GridView.count(
-          physics: NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          childAspectRatio: (sWidth - (sWidth * .55)) / (sHeight * .25),
-          crossAxisSpacing: 10,
-          crossAxisCount: 2,
-          children: List.generate(
-            expenseCategories.length,
-            (index) {
-              return GestureDetector(
-                child: Column(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black26,
-                            spreadRadius: 1,
-                            blurRadius: 5,
-                            offset: Offset(2, 2),
-                          )
-                        ],
+            ],
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          GridView.count(
+            physics: NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            childAspectRatio: (sWidth - (sWidth * .55)) / (sHeight * .25),
+            crossAxisSpacing: 10,
+            crossAxisCount: 2,
+            children: List.generate(
+              expenseCategories.length,
+              (index) {
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (builder) => CategorizedExpense(
+                          category: expenseCategories[index],
+                        ),
                       ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image(
-                          height: sHeight * 0.2,
-                          width: sWidth * 0.46,
-                          fit: BoxFit.cover,
-                          image: AssetImage(
-                            "image/category/${expenseCategories[index]}.jpg",
+                    );
+                  },
+                  child: Column(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black26,
+                              spreadRadius: 1,
+                              blurRadius: 5,
+                              offset: Offset(2, 2),
+                            )
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image(
+                            height: sHeight * 0.2,
+                            width: sWidth * 0.46,
+                            fit: BoxFit.cover,
+                            image: AssetImage(
+                              "image/category/${expenseCategories[index]}.jpg",
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Text(
-                      expenseCategories[index],
-                      overflow: TextOverflow.fade,
-                      softWrap: false,
-                      style: TextStyle(
-                        color: AppColors.text,
-                        fontWeight: FontWeight.bold,
+                      SizedBox(
+                        height: 10,
                       ),
-                    ),
-                  ],
-                ),
-              );
-            },
+                      Text(
+                        expenseCategories[index],
+                        overflow: TextOverflow.fade,
+                        softWrap: false,
+                        style: TextStyle(
+                          color: AppColors.text,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
-        ),
-        category.isNotEmpty
-            ? moreExpense
-                ? ElevatedButton(
-                    onPressed: () {
-                      List<String> tempCategory = category
-                          .asMap()
-                          .map((key, value) {
-                            return MapEntry(key, category[key].category!);
-                          })
-                          .values
-                          .toList();
+          category.isNotEmpty
+              ? moreExpense
+                  ? ElevatedButton(
+                      onPressed: () {
+                        List<String> tempCategory = category
+                            .asMap()
+                            .map((key, value) {
+                              return MapEntry(key, category[key].category!);
+                            })
+                            .values
+                            .toList();
 
-                      setState(() {
-                        expenseCategories = tempCategory;
-                        moreExpense = !moreExpense;
-                      });
-                    },
-                    child: Text(
-                      "View less",
-                      style: TextStyle(
-                        fontSize: 15,
+                        setState(() {
+                          expenseCategories = tempCategory;
+                          moreExpense = !moreExpense;
+                        });
+                      },
+                      child: Text(
+                        "View less",
+                        style: TextStyle(
+                          fontSize: 15,
+                        ),
                       ),
-                    ),
-                    style: elevated,
-                  )
-                : ElevatedButton(
-                    onPressed: () {
-                      List<String> tempCategory = expenseCategories;
-                      for (int i = 0;
-                          i < Category.expenseCategory.length;
-                          i++) {
-                        if (!tempCategory
-                            .contains(Category.expenseCategory[i])) {
-                          tempCategory.add(Category.expenseCategory[i]);
+                      style: elevated,
+                    )
+                  : ElevatedButton(
+                      onPressed: () {
+                        List<String> tempCategory = expenseCategories;
+                        for (int i = 0;
+                            i < Category.expenseCategory.length;
+                            i++) {
+                          if (!tempCategory
+                              .contains(Category.expenseCategory[i])) {
+                            tempCategory.add(Category.expenseCategory[i]);
+                          }
                         }
-                      }
-                      setState(() {
-                        expenseCategories = tempCategory;
-                        moreExpense = !moreExpense;
-                      });
-                    },
-                    child: Text(
-                      "View All",
-                      style: TextStyle(
-                        fontSize: 15,
+                        setState(() {
+                          expenseCategories = tempCategory;
+                          moreExpense = !moreExpense;
+                        });
+                      },
+                      child: Text(
+                        "View All",
+                        style: TextStyle(
+                          fontSize: 15,
+                        ),
                       ),
-                    ),
-                    style: elevated,
-                  )
-            : SizedBox(),
-      ],
+                      style: elevated,
+                    )
+              : SizedBox(),
+        ],
+      ),
     );
   }
 
@@ -962,126 +1197,143 @@ class _HomeState extends State<Home> {
     final sWidth = MediaQuery.of(context).size.width;
     final sHeight = MediaQuery.of(context).size.height;
 
-    return Column(
-      children: [
-        Row(
-          children: [
-            Text(
-              "Income Categories",
-              style: TextStyle(
-                fontSize: 18,
-                color: AppColors.text,
-                fontWeight: FontWeight.bold,
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: sWidth * 0.03,
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Text(
+                "Income Categories",
+                style: TextStyle(
+                  fontSize: 18,
+                  color: AppColors.text,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-          ],
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        GridView.count(
-          physics: NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          childAspectRatio: (sWidth - (sWidth * .55)) / (sHeight * .25),
-          crossAxisSpacing: 10,
-          crossAxisCount: 2,
-          children: List.generate(
-            incomeCategories.length,
-            (index) {
-              return GestureDetector(
-                child: Column(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black26,
-                            spreadRadius: 1,
-                            blurRadius: 5,
-                            offset: Offset(2, 2),
-                          )
-                        ],
+            ],
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          GridView.count(
+            physics: NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            childAspectRatio: (sWidth - (sWidth * .55)) / (sHeight * .25),
+            crossAxisSpacing: 10,
+            crossAxisCount: 2,
+            children: List.generate(
+              incomeCategories.length,
+              (index) {
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (builder) => CategorizedIncome(
+                          category: incomeCategories[index],
+                        ),
                       ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image(
-                          height: sHeight * 0.2,
-                          width: sWidth * 0.46,
-                          fit: BoxFit.cover,
-                          image: AssetImage(
-                            "image/category/${incomeCategories[index]}.jpg",
+                    );
+                  },
+                  child: Column(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black26,
+                              spreadRadius: 1,
+                              blurRadius: 5,
+                              offset: Offset(2, 2),
+                            )
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image(
+                            height: sHeight * 0.2,
+                            width: sWidth * 0.46,
+                            fit: BoxFit.cover,
+                            image: AssetImage(
+                              "image/category/${incomeCategories[index]}.jpg",
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Text(
-                      incomeCategories[index],
-                      overflow: TextOverflow.fade,
-                      softWrap: false,
-                      style: TextStyle(
-                        color: AppColors.text,
-                        fontWeight: FontWeight.bold,
+                      SizedBox(
+                        height: 10,
                       ),
-                    ),
-                  ],
-                ),
-              );
-            },
+                      Text(
+                        incomeCategories[index],
+                        overflow: TextOverflow.fade,
+                        softWrap: false,
+                        style: TextStyle(
+                          color: AppColors.text,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
-        ),
-        category.isNotEmpty
-            ? moreIncome
-                ? ElevatedButton(
-                    onPressed: () {
-                      List<String> tempCategory = category
-                          .asMap()
-                          .map((key, value) {
-                            return MapEntry(key, category[key].category!);
-                          })
-                          .values
-                          .toList();
+          category.isNotEmpty
+              ? moreIncome
+                  ? ElevatedButton(
+                      onPressed: () {
+                        List<String> tempCategory = category
+                            .asMap()
+                            .map((key, value) {
+                              return MapEntry(key, category[key].category!);
+                            })
+                            .values
+                            .toList();
 
-                      setState(() {
-                        incomeCategories = tempCategory;
-                        moreIncome = !moreIncome;
-                      });
-                    },
-                    child: Text(
-                      "View Less",
-                      style: TextStyle(
-                        fontSize: 15,
+                        setState(() {
+                          incomeCategories = tempCategory;
+                          moreIncome = !moreIncome;
+                        });
+                      },
+                      child: Text(
+                        "View Less",
+                        style: TextStyle(
+                          fontSize: 15,
+                        ),
                       ),
-                    ),
-                    style: elevated,
-                  )
-                : ElevatedButton(
-                    onPressed: () {
-                      List<String> tempCategory = incomeCategories;
-                      for (int i = 0; i < Category.incomeCategory.length; i++) {
-                        if (!tempCategory
-                            .contains(Category.incomeCategory[i])) {
-                          tempCategory.add(Category.incomeCategory[i]);
+                      style: elevated,
+                    )
+                  : ElevatedButton(
+                      onPressed: () {
+                        List<String> tempCategory = incomeCategories;
+                        for (int i = 0;
+                            i < Category.incomeCategory.length;
+                            i++) {
+                          if (!tempCategory
+                              .contains(Category.incomeCategory[i])) {
+                            tempCategory.add(Category.incomeCategory[i]);
+                          }
                         }
-                      }
-                      setState(() {
-                        incomeCategories = tempCategory;
-                        moreIncome = !moreIncome;
-                      });
-                    },
-                    child: Text(
-                      "View All",
-                      style: TextStyle(
-                        fontSize: 15,
+                        setState(() {
+                          incomeCategories = tempCategory;
+                          moreIncome = !moreIncome;
+                        });
+                      },
+                      child: Text(
+                        "View All",
+                        style: TextStyle(
+                          fontSize: 15,
+                        ),
                       ),
-                    ),
-                    style: elevated,
-                  )
-            : SizedBox(),
-      ],
+                      style: elevated,
+                    )
+              : SizedBox(),
+        ],
+      ),
     );
   }
 }

@@ -93,4 +93,55 @@ class IncomeHttp {
       "body": jsonDecode(response.body)
     };
   }
+
+  Future<List<IncomeData>> getCategorizedIncome(String category) async {
+    final response = await post(
+      Uri.parse(routeUrl + "income/categorized"),
+      body: {
+        "category": category,
+      },
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer $token",
+      },
+    );
+
+    List resData = jsonDecode(response.body);
+
+    return resData.map((e) => IncomeData.fromJson(e)).toList();
+  }
+
+  Future<List<IncomeData>> getCategorizedSpecificIncome(
+      String category, String startDate, String endDate) async {
+    Map<String, String> incomeData = {
+      "startDate": startDate,
+      "endDate": endDate,
+      "category": category,
+    };
+
+    final response = await post(
+      Uri.parse(routeUrl + "income/categorizedSpecific"),
+      body: incomeData,
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer $token",
+      },
+    );
+
+    List resData = jsonDecode(response.body);
+
+    return resData.map((e) => IncomeData.fromJson(e)).toList();
+  }
+
+  Future<String> getCategoryStartDate(String category) async {
+    final response = await post(
+      Uri.parse(routeUrl + "income/getCategoryStartDate"),
+      body: {
+        "category": category,
+      },
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer $token",
+      },
+    );
+
+    return response.body;
+  }
 }

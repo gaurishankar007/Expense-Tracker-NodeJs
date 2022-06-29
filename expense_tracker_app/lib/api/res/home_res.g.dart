@@ -7,12 +7,13 @@ part of 'home_res.dart';
 // **************************************************************************
 
 HomeData _$HomeDataFromJson(Map<String, dynamic> json) => HomeData(
-      thisMonthExpenses: (json['thisMonthExpenses'] as List<dynamic>?)
-          ?.map((e) => ExpenseData.fromJson(e as Map<String, dynamic>))
+      expenseDays: (json['expenseDays'] as List<dynamic>?)
+          ?.map((e) => e as int)
           .toList(),
-      thisMonthIncomes: (json['thisMonthIncomes'] as List<dynamic>?)
-          ?.map((e) => IncomeData.fromJson(e as Map<String, dynamic>))
+      expenseAmounts: (json['expenseAmounts'] as List<dynamic>?)
+          ?.map((e) => e as int)
           .toList(),
+      maxExpenseAmount: json['maxExpenseAmount'] as int?,
       thisMonthExpenseCategories: (json['thisMonthExpenseCategories']
               as List<dynamic>?)
           ?.map((e) => ExpenseCategorized.fromJson(e as Map<String, dynamic>))
@@ -42,8 +43,9 @@ HomeData _$HomeDataFromJson(Map<String, dynamic> json) => HomeData(
     );
 
 Map<String, dynamic> _$HomeDataToJson(HomeData instance) => <String, dynamic>{
-      'thisMonthExpenses': instance.thisMonthExpenses,
-      'thisMonthIncomes': instance.thisMonthIncomes,
+      'expenseDays': instance.expenseDays,
+      'expenseAmounts': instance.expenseAmounts,
+      'maxExpenseAmount': instance.maxExpenseAmount,
       'thisMonthExpenseCategories': instance.thisMonthExpenseCategories,
       'thisMonthIncomeCategories': instance.thisMonthIncomeCategories,
       'thisMonthExpenseAmount': instance.thisMonthExpenseAmount,

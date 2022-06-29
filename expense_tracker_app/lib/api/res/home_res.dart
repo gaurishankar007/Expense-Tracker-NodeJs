@@ -6,8 +6,9 @@ part 'home_res.g.dart';
 
 @JsonSerializable()
 class HomeData {
-  List<ExpenseData>? thisMonthExpenses;
-  List<IncomeData>? thisMonthIncomes;
+  List<int>? expenseDays;
+  List<int>? expenseAmounts;
+  int? maxExpenseAmount;
   List<ExpenseCategorized>? thisMonthExpenseCategories;
   List<IncomeCategorized>? thisMonthIncomeCategories;
   int? thisMonthExpenseAmount;
@@ -22,8 +23,9 @@ class HomeData {
   double? previousMonthIncomeRate;
 
   HomeData({
-    this.thisMonthExpenses,
-    this.thisMonthIncomes,
+    this.expenseDays,
+    this.expenseAmounts,
+    this.maxExpenseAmount,
     this.thisMonthExpenseCategories,
     this.thisMonthIncomeCategories,
     this.thisMonthExpenseAmount,

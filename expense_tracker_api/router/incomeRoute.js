@@ -202,16 +202,16 @@ router.post("/income/getSpecific", auth.verifyUser, async (req, res) => {
   const eDate = req.body.endDate;
 
   if (sDate.trim() === "" || eDate.trim() === "") {
-    return res.send({ resM: "Provide both start and end date." });
+    return res.status(400).send({ resM: "Provide both start and end date." });
   }
 
   const currentDateTime = new Date();
 
-  startDate = new Date(
+  const startDate = new Date(
     new Date(sDate).getTime() + currentDateTime.getTimezoneOffset() * 60 * 1000
   );
 
-  endDate = new Date(
+  const endDate = new Date(
     new Date(eDate).getTime() + currentDateTime.getTimezoneOffset() * 60 * 1000
   );
 
@@ -252,13 +252,13 @@ router.post("/income/getSpecific", auth.verifyUser, async (req, res) => {
   });
 });
 
-router.delete("/income/remove", (req, res) => {
+router.delete("/income/remove", auth.verifyUser, (req, res) => {
   income.findOneAndDelete({ _id: req.body.incomeId }).then(() => {
     res.send({ resM: "Income removed." });
   });
 });
 
-router.put("/income/edit", (req, res) => {
+router.put("/income/edit", auth.verifyUser, (req, res) => {
   const incomeId = req.body.incomeId;
   const name = req.body.name;
   const amount = req.body.amount;
@@ -296,5 +296,104 @@ router.put("/income/edit", (req, res) => {
       res.send({ resM: "Income edited." });
     });
 });
+
+router.post("/income/categorized", auth.verifyUser, async (req, res) => {
+  const category = req.body.category;
+
+  if (category.trim() === "") {
+    return res.send({ resM: "Provide income category." });
+  }
+
+  const currentDateTime = new Date();
+
+  const thisMonth = new Date(
+    new Date(
+      currentDateTime.toISOString().split("T")[0].split("-")[0] +
+        "-" +
+        currentDateTime.toISOString().split("T")[0].split("-")[1] +
+        "-01"
+    ).getTime() +
+      currentDateTime.getTimezoneOffset() * 60 * 1000
+  );
+
+  const thisMonthIncomes = await income
+    .find({
+      user: req.userInfo._id,
+      category: category,
+      createdAt: { $gte: thisMonth },
+    })
+    .sort({ amount: -1 });
+
+  res.send(thisMonthIncomes);
+});
+
+router.post(
+  "/income/categorizedSpecific",
+  auth.verifyUser,
+  async (req, res) => {
+    const category = req.body.category;
+    const sDate = req.body.startDate;
+    const eDate = req.body.endDate;
+
+    if (category.trim() === "" || sDate.trim() === "" || eDate.trim() === "") {
+      return res
+        .status(400)
+        .send({ resM: "Provide both start and end date along with category." });
+    }
+
+    const currentDateTime = new Date();
+
+    const startDate = new Date(
+      new Date(sDate).getTime() +
+        currentDateTime.getTimezoneOffset() * 60 * 1000
+    );
+
+    const endDate = new Date(
+      new Date(eDate).getTime() +
+        currentDateTime.getTimezoneOffset() * 60 * 1000
+    );
+
+    const thisMonthIncomes = await income
+      .find({
+        user: req.userInfo._id,
+        category: category,
+        createdAt: {
+          $gte: startDate,
+          $lte: endDate,
+        },
+      })
+      .sort({ amount: -1 });
+
+    res.send(thisMonthIncomes);
+  }
+);
+
+router.post(
+  "/income/getCategoryStartDate",
+  auth.verifyUser,
+  async (req, res) => {
+    const category = req.body.category;
+
+    if (category.trim() === "") {
+      return res.send({ resM: "Provide income category." });
+    }
+
+    const firstExpenseCategory = await income
+      .findOne({
+        user: req.userInfo._id,
+        category: category,
+      })
+      .sort({ createdAt: 1 });
+
+    const currentDateTime = new Date();
+
+    const startDate =
+      firstExpenseCategory === null
+        ? currentDateTime.toISOString().split("T")[0]
+        : firstExpenseCategory.createdAt.toISOString().split("T")[0];
+
+    res.send(startDate);
+  }
+);
 
 module.exports = router;
