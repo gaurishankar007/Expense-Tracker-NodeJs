@@ -6,6 +6,7 @@ part 'home_res.g.dart';
 
 @JsonSerializable()
 class HomeData {
+  bool? thisMonthView;
   List<int>? expenseDays;
   List<int>? expenseAmounts;
   int? maxExpenseAmount;
@@ -23,6 +24,7 @@ class HomeData {
   double? previousMonthIncomeRate;
 
   HomeData({
+    this.thisMonthView,
     this.expenseDays,
     this.expenseAmounts,
     this.maxExpenseAmount,

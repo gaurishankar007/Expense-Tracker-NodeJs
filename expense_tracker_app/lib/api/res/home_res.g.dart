@@ -7,6 +7,7 @@ part of 'home_res.dart';
 // **************************************************************************
 
 HomeData _$HomeDataFromJson(Map<String, dynamic> json) => HomeData(
+      thisMonthView: json['thisMonthView'] as bool?,
       expenseDays: (json['expenseDays'] as List<dynamic>?)
           ?.map((e) => e as int)
           .toList(),
@@ -43,6 +44,7 @@ HomeData _$HomeDataFromJson(Map<String, dynamic> json) => HomeData(
     );
 
 Map<String, dynamic> _$HomeDataToJson(HomeData instance) => <String, dynamic>{
+      'thisMonthView': instance.thisMonthView,
       'expenseDays': instance.expenseDays,
       'expenseAmounts': instance.expenseAmounts,
       'maxExpenseAmount': instance.maxExpenseAmount,

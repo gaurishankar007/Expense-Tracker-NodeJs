@@ -184,7 +184,9 @@ class _HomeState extends State<Home> {
                                     child: Row(
                                       children: [
                                         Text(
-                                          "This Month Expenses",
+                                          snapshot.data!.thisMonthView!
+                                              ? "This"
+                                              : "Previous" " Month Expenses",
                                           style: TextStyle(
                                             fontSize: 18,
                                             color: AppColors.text,
@@ -193,9 +195,6 @@ class _HomeState extends State<Home> {
                                         ),
                                       ],
                                     ),
-                                  ),
-                                  SizedBox(
-                                    height: 10,
                                   ),
                                   expenseLineChart(
                                     context,
@@ -206,13 +205,7 @@ class _HomeState extends State<Home> {
                                 ],
                               )
                             : SizedBox(),
-                        SizedBox(
-                          height: 10,
-                        ),
                         feedback(context, snapshot.data!),
-                        SizedBox(
-                          height: 20,
-                        ),
                         expenseDetail(context,
                             snapshot.data!.thisMonthExpenseCategories!),
                         SizedBox(
@@ -266,168 +259,177 @@ class _HomeState extends State<Home> {
           (expenseAmounts[i] / maxExpenseAmount) * 5));
     }
 
-    return SizedBox(
-      height: 200,
-      width: sWidth * .94,
-      child: LineChart(
-        LineChartData(
-          lineTouchData: LineTouchData(
-            handleBuiltInTouches: true,
-            touchTooltipData: LineTouchTooltipData(
-                tooltipBgColor: AppColors.primary,
-                tooltipRoundedRadius: 5,
-                getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
-                  return touchedBarSpots.map((barSpot) {
-                    final flSpot = barSpot;
-                    if (flSpot.x == 0 || flSpot.x == 6) {
-                      return null;
-                    }
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        vertical: 10,
+      ),
+      child: SizedBox(
+        height: 200,
+        width: sWidth * .94,
+        child: LineChart(
+          LineChartData(
+            lineTouchData: LineTouchData(
+              handleBuiltInTouches: true,
+              touchTooltipData: LineTouchTooltipData(
+                  tooltipBgColor: AppColors.primary,
+                  tooltipRoundedRadius: 5,
+                  getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
+                    return touchedBarSpots.map((barSpot) {
+                      final flSpot = barSpot;
+                      if (flSpot.x == 0 || flSpot.x == 6) {
+                        return null;
+                      }
 
-                    return LineTooltipItem(
-                      "Rs. ${((flSpot.y / 5) * maxExpenseAmount).round()}",
-                      const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      return LineTooltipItem(
+                        "Rs. ${((flSpot.y / 5) * maxExpenseAmount).round()}",
+                        const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      );
+                    }).toList();
+                  }),
+            ),
+            gridData: FlGridData(
+              show: true,
+              drawVerticalLine: true,
+              horizontalInterval: 1,
+              verticalInterval: 1,
+              getDrawingHorizontalLine: (value) {
+                return FlLine(
+                  color: Color(0xFFAAAEB1),
+                  strokeWidth: 1,
+                );
+              },
+              getDrawingVerticalLine: (value) {
+                return FlLine(
+                  color: Color(0xFFAAAEB1),
+                  strokeWidth: 1,
+                );
+              },
+            ),
+            titlesData: FlTitlesData(
+              leftTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  interval: 1,
+                  reservedSize: 25,
+                  getTitlesWidget: (double value, TitleMeta meta) {
+                    TextStyle style = TextStyle(
+                      color: AppColors.text,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 8,
                     );
-                  }).toList();
-                }),
-          ),
-          gridData: FlGridData(
-            show: true,
-            drawVerticalLine: true,
-            horizontalInterval: 1,
-            verticalInterval: 1,
-            getDrawingHorizontalLine: (value) {
-              return FlLine(
-                color: Color(0xFFAAAEB1),
-                strokeWidth: 1,
-              );
-            },
-            getDrawingVerticalLine: (value) {
-              return FlLine(
-                color: Color(0xFFAAAEB1),
-                strokeWidth: 1,
-              );
-            },
-          ),
-          titlesData: FlTitlesData(
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                interval: 1,
-                reservedSize: 25,
-                getTitlesWidget: (double value, TitleMeta meta) {
-                  TextStyle style = TextStyle(
-                    color: AppColors.text,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 8,
-                  );
-                  String text = "";
-                  String amount1 = (maxExpenseAmount / 5000) > 0.1
-                      ? (maxExpenseAmount / 5000).toStringAsFixed(1) + "k"
-                      : (maxExpenseAmount / 5000).toStringAsFixed(2) + "k";
-                  String amount2 = ((maxExpenseAmount / 5000) * 2) > 0.1
-                      ? ((maxExpenseAmount / 5000) * 2).toStringAsFixed(1) + "k"
-                      : ((maxExpenseAmount / 5000) * 2).toStringAsFixed(2) +
-                          "k";
-                  String amount3 = ((maxExpenseAmount / 5000) * 3) > 0.1
-                      ? ((maxExpenseAmount / 5000) * 3).toStringAsFixed(1) + "k"
-                      : ((maxExpenseAmount / 5000) * 3).toStringAsFixed(2) +
-                          "k";
-                  String amount4 = ((maxExpenseAmount / 5000) * 4) > 0.1
-                      ? ((maxExpenseAmount / 5000) * 4).toStringAsFixed(1) + "k"
-                      : ((maxExpenseAmount / 5000) * 4).toStringAsFixed(2) +
-                          "k";
-                  String amount5 = (maxExpenseAmount / 1000) > 0.1
-                      ? (maxExpenseAmount / 1000).toStringAsFixed(1) + "k"
-                      : (maxExpenseAmount / 1000).toStringAsFixed(2) + "k";
+                    String text = "";
+                    String amount1 = (maxExpenseAmount / 5000) > 0.1
+                        ? (maxExpenseAmount / 5000).toStringAsFixed(1) + "k"
+                        : (maxExpenseAmount / 5000).toStringAsFixed(2) + "k";
+                    String amount2 = ((maxExpenseAmount / 5000) * 2) > 0.1
+                        ? ((maxExpenseAmount / 5000) * 2).toStringAsFixed(1) +
+                            "k"
+                        : ((maxExpenseAmount / 5000) * 2).toStringAsFixed(2) +
+                            "k";
+                    String amount3 = ((maxExpenseAmount / 5000) * 3) > 0.1
+                        ? ((maxExpenseAmount / 5000) * 3).toStringAsFixed(1) +
+                            "k"
+                        : ((maxExpenseAmount / 5000) * 3).toStringAsFixed(2) +
+                            "k";
+                    String amount4 = ((maxExpenseAmount / 5000) * 4) > 0.1
+                        ? ((maxExpenseAmount / 5000) * 4).toStringAsFixed(1) +
+                            "k"
+                        : ((maxExpenseAmount / 5000) * 4).toStringAsFixed(2) +
+                            "k";
+                    String amount5 = (maxExpenseAmount / 1000) > 0.1
+                        ? (maxExpenseAmount / 1000).toStringAsFixed(1) + "k"
+                        : (maxExpenseAmount / 1000).toStringAsFixed(2) + "k";
 
-                  if (value.toInt() == 1) {
-                    text = amount1;
-                  } else if (value.toInt() == 2) {
-                    text = amount2;
-                  } else if (value.toInt() == 3) {
-                    text = amount3;
-                  } else if (value.toInt() == 4) {
-                    text = amount4;
-                  } else if (value.toInt() == 5) {
-                    text = amount5;
-                  }
-
-                  return Text(text, style: style, textAlign: TextAlign.center);
-                },
-              ),
-            ),
-            rightTitles: AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-            topTitles: AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: 15,
-                interval: 1,
-                getTitlesWidget: (double value, TitleMeta meta) {
-                  TextStyle style = TextStyle(
-                    color: AppColors.text,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 7,
-                  );
-                  Widget text = Text("");
-
-                  for (int i = 0; i < 31; i++) {
-                    if (value.toInt() == i) {
-                      text = Text((i + 1).toString(), style: style);
+                    if (value.toInt() == 1) {
+                      text = amount1;
+                    } else if (value.toInt() == 2) {
+                      text = amount2;
+                    } else if (value.toInt() == 3) {
+                      text = amount3;
+                    } else if (value.toInt() == 4) {
+                      text = amount4;
+                    } else if (value.toInt() == 5) {
+                      text = amount5;
                     }
-                  }
 
-                  return SideTitleWidget(
-                    axisSide: meta.axisSide,
-                    space: 5,
-                    child: text,
-                  );
-                },
+                    return Text(text,
+                        style: style, textAlign: TextAlign.center);
+                  },
+                ),
+              ),
+              rightTitles: AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+              topTitles: AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  reservedSize: 15,
+                  interval: 1,
+                  getTitlesWidget: (double value, TitleMeta meta) {
+                    TextStyle style = TextStyle(
+                      color: AppColors.text,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 7,
+                    );
+                    Widget text = Text("");
+
+                    for (int i = 1; i < 32; i++) {
+                      if (value.toInt() == i) {
+                        text = Text(i.toString(), style: style);
+                      }
+                    }
+
+                    return SideTitleWidget(
+                      axisSide: meta.axisSide,
+                      space: 5,
+                      child: text,
+                    );
+                  },
+                ),
               ),
             ),
+            borderData: FlBorderData(
+              show: true,
+              border: Border(
+                bottom: BorderSide(
+                  color: AppColors.primary,
+                  width: 3,
+                ),
+                left: BorderSide(
+                  color: AppColors.primary,
+                  width: 3,
+                ),
+                right: BorderSide(color: Colors.transparent),
+                top: BorderSide(color: Colors.transparent),
+              ),
+            ),
+            lineBarsData: [
+              LineChartBarData(
+                isCurved: true,
+                color: Colors.red,
+                barWidth: 1,
+                isStrokeCapRound: true,
+                dotData: FlDotData(show: true),
+                belowBarData: BarAreaData(
+                  show: true,
+                  color: Color(0xFFF08F88),
+                ),
+                spots: expenseLineData,
+              ),
+            ],
+            minX: 0,
+            maxX: 32,
+            maxY: 5,
+            minY: 0,
           ),
-          borderData: FlBorderData(
-            show: true,
-            border: Border(
-              bottom: BorderSide(
-                color: AppColors.primary,
-                width: 3,
-              ),
-              left: BorderSide(
-                color: AppColors.primary,
-                width: 3,
-              ),
-              right: BorderSide(color: Colors.transparent),
-              top: BorderSide(color: Colors.transparent),
-            ),
-          ),
-          lineBarsData: [
-            LineChartBarData(
-              isCurved: true,
-              color: Colors.red,
-              barWidth: 1,
-              isStrokeCapRound: true,
-              dotData: FlDotData(show: true),
-              belowBarData: BarAreaData(
-                show: true,
-                color: Color(0xFFF08F88),
-              ),
-              spots: expenseLineData,
-            ),
-          ],
-          minX: 0,
-          maxX: 31,
-          maxY: 5,
-          minY: 0,
+          swapAnimationDuration: const Duration(milliseconds: 250),
         ),
-        swapAnimationDuration: const Duration(milliseconds: 250),
       ),
     );
   }
@@ -435,6 +437,51 @@ class _HomeState extends State<Home> {
   Widget shortNote(BuildContext context) {
     return SimpleDialog(
       children: [
+        SimpleDialogOption(
+          padding: EdgeInsets.symmetric(
+            vertical: 5,
+            horizontal: 20,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    "Expense:",
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: AppColors.text,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                  Icon(
+                    Icons.money_off_csred_rounded,
+                    color: Colors.red,
+                    size: 25,
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Text(
+                    "Income:",
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: AppColors.text,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                  Icon(
+                    Icons.attach_money_rounded,
+                    color: Colors.green,
+                    size: 25,
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
         SimpleDialogOption(
           padding: EdgeInsets.symmetric(
             vertical: 5,
@@ -554,8 +601,10 @@ class _HomeState extends State<Home> {
     }
 
     return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: sWidth * 0.03,
+      padding: EdgeInsets.only(
+        right: sWidth * 0.03,
+        left: sWidth * 0.03,
+        bottom: 10,
       ),
       child: Column(
         children: [
@@ -583,254 +632,264 @@ class _HomeState extends State<Home> {
             height: 5,
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: homeData.thisMonthExpenseAmount == 0 &&
+                    homeData.thisMonthIncomeAmount == 0
+                ? MainAxisAlignment.spaceBetween
+                : MainAxisAlignment.start,
             children: [
-              SizedBox(
-                width: sWidth * .45,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.money_off_csred_rounded,
-                            color: Colors.red,
-                            size: 25,
-                          ),
-                          Text(
-                            "Rs. ${homeData.thisMonthExpenseAmount!}",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: AppColors.text,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 8,
-                      ),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.money_off_csred_rounded,
-                            color: Colors.red,
-                            size: 25,
-                          ),
-                          Text(
-                            "Rs. ${homeData.thisMonthExpenseRate!} ",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: AppColors.text,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (ctx) => shortNote(context),
-                              );
-                            },
-                            child: Text(
-                              "ExD",
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 8,
-                      ),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.money_off_csred_rounded,
-                            color: Colors.red,
-                            size: 25,
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Rs. ${homeData.maxExpenseCategory!.amount}",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: AppColors.text,
-                                  fontWeight: FontWeight.bold,
+              homeData.thisMonthExpenseAmount == 0
+                  ? SizedBox()
+                  : SizedBox(
+                      width: sWidth * .45,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.money_off_csred_rounded,
+                                  color: Colors.red,
+                                  size: 25,
                                 ),
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    "${homeData.maxExpenseCategory!.category} ",
+                                Text(
+                                  "Rs. ${homeData.thisMonthExpenseAmount!}",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: AppColors.text,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 8,
+                            ),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.money_off_csred_rounded,
+                                  color: Colors.red,
+                                  size: 25,
+                                ),
+                                Text(
+                                  "Rs. ${homeData.thisMonthExpenseRate!} ",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: AppColors.text,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (ctx) => shortNote(context),
+                                    );
+                                  },
+                                  child: Text(
+                                    "ExD",
                                     style: TextStyle(
                                       fontSize: 14,
-                                      color: AppColors.text,
+                                      color: AppColors.primary,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (ctx) => shortNote(context),
-                                      );
-                                    },
-                                    child: Text(
-                                      "MxEC",
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 8,
+                            ),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.money_off_csred_rounded,
+                                  color: Colors.red,
+                                  size: 25,
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Rs. ${homeData.maxExpenseCategory!.amount}",
                                       style: TextStyle(
                                         fontSize: 14,
-                                        color: AppColors.primary,
+                                        color: AppColors.text,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: sWidth * .45,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.attach_money_rounded,
-                            color: Colors.green,
-                            size: 25,
-                          ),
-                          Text(
-                            "Rs. ${homeData.thisMonthIncomeAmount!}",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: AppColors.text,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 8,
-                      ),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.attach_money_rounded,
-                            color: Colors.green,
-                            size: 25,
-                          ),
-                          Text(
-                            "Rs. ${homeData.thisMonthIncomeRate!} ",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: AppColors.text,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (ctx) => shortNote(context),
-                              );
-                            },
-                            child: Text(
-                              "InD",
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 8,
-                      ),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.attach_money_rounded,
-                            color: Colors.green,
-                            size: 25,
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Rs. ${homeData.maxIncomeCategory!.amount}",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: AppColors.text,
-                                  fontWeight: FontWeight.bold,
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          "${homeData.maxExpenseCategory!.category} ",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: AppColors.text,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            showDialog(
+                                              context: context,
+                                              builder: (ctx) =>
+                                                  shortNote(context),
+                                            );
+                                          },
+                                          child: Text(
+                                            "MxEC",
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: AppColors.primary,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  ],
                                 ),
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    "${homeData.maxIncomeCategory!.category} ",
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+              homeData.thisMonthIncomeAmount == 0
+                  ? SizedBox()
+                  : SizedBox(
+                      width: sWidth * .45,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.attach_money_rounded,
+                                  color: Colors.green,
+                                  size: 25,
+                                ),
+                                Text(
+                                  "Rs. ${homeData.thisMonthIncomeAmount!}",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: AppColors.text,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 8,
+                            ),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.attach_money_rounded,
+                                  color: Colors.green,
+                                  size: 25,
+                                ),
+                                Text(
+                                  "Rs. ${homeData.thisMonthIncomeRate!} ",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: AppColors.text,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (ctx) => shortNote(context),
+                                    );
+                                  },
+                                  child: Text(
+                                    "InD",
                                     style: TextStyle(
                                       fontSize: 14,
-                                      color: AppColors.text,
+                                      color: AppColors.primary,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (ctx) => shortNote(context),
-                                      );
-                                    },
-                                    child: Text(
-                                      "MxIC",
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 8,
+                            ),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.attach_money_rounded,
+                                  color: Colors.green,
+                                  size: 25,
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Rs. ${homeData.maxIncomeCategory!.amount}",
                                       style: TextStyle(
                                         fontSize: 14,
-                                        color: AppColors.primary,
+                                        color: AppColors.text,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
-                        ],
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          "${homeData.maxIncomeCategory!.category} ",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: AppColors.text,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            showDialog(
+                                              context: context,
+                                              builder: (ctx) =>
+                                                  shortNote(context),
+                                            );
+                                          },
+                                          child: Text(
+                                            "MxIC",
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: AppColors.primary,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                    ],
-                  ),
-                ),
-              ),
+                    ),
             ],
           ),
           SizedBox(
             height: 5,
           ),
-          homeData.thisMonthExpenseAmount! < homeData.thisMonthIncomeAmount!
+          homeData.thisMonthExpenseAmount! < homeData.thisMonthIncomeAmount! &&
+                  homeData.thisMonthExpenseAmount != 0
               ? Padding(
                   padding: const EdgeInsets.only(top: 5),
                   child: Row(
@@ -861,7 +920,8 @@ class _HomeState extends State<Home> {
               : SizedBox(),
           homeData.previousMonthExpenseAmount! != 0 &&
                   homeData.thisMonthExpenseRate! <
-                      homeData.previousMonthExpenseRate!
+                      homeData.previousMonthExpenseRate! &&
+                  homeData.thisMonthExpenseAmount != 0
               ? Padding(
                   padding: const EdgeInsets.only(top: 5),
                   child: Row(
@@ -952,7 +1012,8 @@ class _HomeState extends State<Home> {
                   ),
                 )
               : SizedBox(),
-          homeData.thisMonthExpenseAmount! > homeData.thisMonthIncomeAmount!
+          homeData.thisMonthExpenseAmount! > homeData.thisMonthIncomeAmount! &&
+                  homeData.thisMonthIncomeAmount != 0
               ? Padding(
                   padding: const EdgeInsets.only(top: 5),
                   child: Row(
