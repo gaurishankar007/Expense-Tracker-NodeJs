@@ -12,17 +12,17 @@ class HomeHttp {
   final token = LogStatus.token;
 
   Future<HomeData> viewHome() async {
-    // try {} on SocketException catch (_) {
-    //   return HomeData();
-    // }
+    try {
+      final response = await get(
+        Uri.parse(routeUrl + "user/getHome"),
+        headers: {
+          HttpHeaders.authorizationHeader: "Bearer $token",
+        },
+      );
 
-    final response = await get(
-      Uri.parse(routeUrl + "user/getHome"),
-      headers: {
-        HttpHeaders.authorizationHeader: "Bearer $token",
-      },
-    );
-
-    return HomeData.fromJson(jsonDecode(response.body));
+      return HomeData.fromJson(jsonDecode(response.body));
+    } catch (error) {
+      return Future.error(error);
+    }
   }
 }

@@ -3,11 +3,12 @@ const express = require("express");
 const router = new express.Router();
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const validator = require("validator");
+const mongoose = require("mongoose");
 const fs = require("fs");
 
 // Importing self made js files....
 const user = require("../model/userModel");
+const progress = require("../model/progressModel");
 const auth = require("../authentication/auth.js");
 const profileUpload = require("../setting/profileSetting.js");
 
@@ -23,7 +24,7 @@ router.post("/user/register", (req, res) => {
   const emailRegex = new RegExp(
     "^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+.[a-zA-Z]+"
   );
-  const profileNameRegex =  /^[a-zA-Z\s]*$/;
+  const profileNameRegex = /^[a-zA-Z\s]*$/;
 
   if (
     email.trim() === "" ||
@@ -56,13 +57,18 @@ router.post("/user/register", (req, res) => {
     }
 
     bcryptjs.hash(password, 10, async function (e, hashed_value) {
-      const newUser = new user({
+      const newUser = await user.create({
         email: email,
         password: hashed_value,
         profileName: profileName,
       });
 
-      newUser.save().then(() => {
+      const newProgress = new progress({
+        user: newUser._id,
+        badge: mongoose.Types.ObjectId("62c017a6e641bef273362a76"),
+      });
+
+      newProgress.save().then(() => {
         res.status(201).send({ resM: "Your account has been created." });
       });
     });

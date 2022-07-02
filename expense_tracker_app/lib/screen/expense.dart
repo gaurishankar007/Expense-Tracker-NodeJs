@@ -85,7 +85,7 @@ class _ExpenseState extends State<Expense> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   children = <Widget>[
                     Container(
-                      width: sWidth * 0.97,
+                      width: sWidth,
                       height: sHeight,
                       alignment: Alignment.center,
                       child: CircularProgressIndicator(
@@ -435,19 +435,48 @@ class _ExpenseState extends State<Expense> {
                       ),
                     ];
                   } else if (snapshot.hasError) {
-                    children = <Widget>[
-                      Container(
-                        width: sWidth * 0.97,
-                        height: sHeight,
-                        alignment: Alignment.center,
-                        child: Text(
-                          "${snapshot.error}",
-                          style: TextStyle(
-                            fontSize: 15,
+                    if ("${snapshot.error}".split("Exception: ")[0] ==
+                        "Socket") {
+                      children = <Widget>[
+                        Container(
+                          width: sWidth,
+                          height: sHeight,
+                          alignment: Alignment.center,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              Icon(
+                                Icons.warning_rounded,
+                                size: 25,
+                                color: Colors.red,
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Text(
+                                "Connection Problem",
+                                style: TextStyle(
+                                    fontSize: 15, fontWeight: FontWeight.bold),
+                              ),
+                            ],
                           ),
-                        ),
-                      )
-                    ];
+                        )
+                      ];
+                    } else {
+                      children = <Widget>[
+                        Container(
+                          width: sWidth,
+                          height: sHeight,
+                          alignment: Alignment.center,
+                          child: Text(
+                            "${snapshot.error}",
+                            style: TextStyle(
+                              fontSize: 15,
+                            ),
+                          ),
+                        )
+                      ];
+                    }
                   }
                 }
                 return Column(

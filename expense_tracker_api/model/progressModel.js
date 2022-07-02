@@ -22,10 +22,17 @@ const progressSchema = new mongoose.Schema(
       ref: "badge",
     },
 
-    achievement: [
+    oldAchievement: [
       {
         type: mongoose.Schema.ObjectId,
-        ref: "badge",
+        ref: "achievement",
+      },
+    ],
+
+    newAchievement: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "achievement",
       },
     ],
   },

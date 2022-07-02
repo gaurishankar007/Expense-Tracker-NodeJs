@@ -24,6 +24,12 @@ app.use(income);
 const home = require("./router/homeRoute");
 app.use(home);
 
+const badge = require("./router/badgeRoute");
+app.use(badge);
+
+const achievement = require("./router/achievementRoute");
+app.use(achievement);
+
 app.listen(8848, () => {
   console.log("Server running on port: 8848...");
 });

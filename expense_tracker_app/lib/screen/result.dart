@@ -20,7 +20,7 @@ class _ResultState extends State<Result> {
           padding: EdgeInsets.only(
             top: 10,
             right: sWidth * 0.03,
-            bottom: 80,
+            bottom: 10,
             left: sWidth * 0.03,
           ),
           child: Column(

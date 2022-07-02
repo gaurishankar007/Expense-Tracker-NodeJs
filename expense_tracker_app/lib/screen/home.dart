@@ -118,43 +118,6 @@ class _HomeState extends State<Home> {
           ),
           child: Column(
             children: [
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: sWidth * 0.03,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      greeting,
-                      style: TextStyle(
-                        color: AppColors.text,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    IconButton(
-                      constraints: BoxConstraints(),
-                      padding: EdgeInsets.zero,
-                      icon: Icon(
-                        Icons.settings,
-                        color: AppColors.primary,
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (builder) => Setting(),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
               FutureBuilder<HomeData>(
                 future: userHomeData,
                 builder: ((context, snapshot) {
@@ -162,7 +125,7 @@ class _HomeState extends State<Home> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     children = <Widget>[
                       Container(
-                        width: sWidth * 0.97,
+                        width: sWidth,
                         height: sHeight,
                         alignment: Alignment.center,
                         child: CircularProgressIndicator(
@@ -174,6 +137,43 @@ class _HomeState extends State<Home> {
                   } else {
                     if (snapshot.hasData) {
                       children = <Widget>[
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: sWidth * 0.03,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                greeting,
+                                style: TextStyle(
+                                  color: AppColors.text,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              IconButton(
+                                constraints: BoxConstraints(),
+                                padding: EdgeInsets.zero,
+                                icon: Icon(
+                                  Icons.settings,
+                                  color: AppColors.primary,
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (builder) => Setting(),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
                         snapshot.data!.expenseDays!.length > 1
                             ? Column(
                                 children: [
@@ -217,19 +217,49 @@ class _HomeState extends State<Home> {
                         )
                       ];
                     } else if (snapshot.hasError) {
-                      children = <Widget>[
-                        Container(
-                          width: sWidth * 0.97,
-                          height: sHeight,
-                          alignment: Alignment.center,
-                          child: Text(
-                            "${snapshot.error}",
-                            style: TextStyle(
-                              fontSize: 15,
+                      if ("${snapshot.error}".split("Exception: ")[0] ==
+                          "Socket") {
+                        children = <Widget>[
+                          Container(
+                            width: sWidth,
+                            height: sHeight,
+                            alignment: Alignment.center,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                Icon(
+                                  Icons.warning_rounded,
+                                  size: 25,
+                                  color: Colors.red,
+                                ),
+                                SizedBox(
+                                  width: 5,
+                                ),
+                                Text(
+                                  "Connection Problem",
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
                             ),
-                          ),
-                        )
-                      ];
+                          )
+                        ];
+                      } else {
+                        children = <Widget>[
+                          Container(
+                            width: sWidth,
+                            height: sHeight,
+                            alignment: Alignment.center,
+                            child: Text(
+                              "${snapshot.error}",
+                              style: TextStyle(
+                                fontSize: 15,
+                              ),
+                            ),
+                          )
+                        ];
+                      }
                     }
                   }
                   return Column(

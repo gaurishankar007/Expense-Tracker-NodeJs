@@ -15,117 +15,146 @@ class UserHttp {
   final token = LogStatus.token;
 
   Future<Map> changePassword(String currentPassword, String newPassword) async {
-    Map<String, String> userData = {
-      "currentPassword": currentPassword,
-      "newPassword": newPassword,
-    };
+    try {
+      Map<String, String> userData = {
+        "currentPassword": currentPassword,
+        "newPassword": newPassword,
+      };
 
-    final response = await put(
-      Uri.parse(routeUrl + "user/changePassword"),
-      body: userData,
-      headers: {
-        HttpHeaders.authorizationHeader: "Bearer $token",
-      },
-    );
+      final response = await put(
+        Uri.parse(routeUrl + "user/changePassword"),
+        body: userData,
+        headers: {
+          HttpHeaders.authorizationHeader: "Bearer $token",
+        },
+      );
 
-    return {
-      "statusCode": response.statusCode,
-      "body": jsonDecode(response.body) as Map,
-    };
+      return {
+        "statusCode": response.statusCode,
+        "body": jsonDecode(response.body) as Map,
+      };
+    } catch (error) {
+      return Future.error(error);
+    }
   }
 
   Future<User> getUser() async {
-    final response = await get(
-      Uri.parse(routeUrl + "user/view"),
-      headers: {
-        HttpHeaders.authorizationHeader: "Bearer $token",
-      },
-    );
+    try {
+      final response = await get(
+        Uri.parse(routeUrl + "user/view"),
+        headers: {
+          HttpHeaders.authorizationHeader: "Bearer $token",
+        },
+      );
 
-    return User.fromJson(jsonDecode(response.body));
+      return User.fromJson(jsonDecode(response.body));
+    } catch (error) {
+      return Future.error(error);
+    }
   }
 
   Future<Map> ChangeProfilePicture(File profilePicture) async {
-    // Making multipart request
-    var request = http.MultipartRequest(
-        'PUT', Uri.parse(routeUrl + "user/changeProfilePicture"));
+    try {
+      // Making multipart request
+      var request = http.MultipartRequest(
+          'PUT', Uri.parse(routeUrl + "user/changeProfilePicture"));
 
-    // Adding headers
-    request.headers.addAll({
-      'Authorization': 'Bearer $token',
-    });
+      // Adding headers
+      request.headers.addAll({
+        'Authorization': 'Bearer $token',
+      });
 
-    // Adding images
-    MultipartFile profile = http.MultipartFile(
-      'profile',
-      profilePicture.readAsBytes().asStream(),
-      profilePicture.lengthSync(),
-      filename: profilePicture.path.split('/').last,
-    );
+      // Adding images
+      MultipartFile profile = http.MultipartFile(
+        'profile',
+        profilePicture.readAsBytes().asStream(),
+        profilePicture.lengthSync(),
+        filename: profilePicture.path.split('/').last,
+      );
 
-    request.files.add(profile);
+      request.files.add(profile);
 
-    final response = await request.send();
-    var responseString = await response.stream.bytesToString();
-    final responseData = jsonDecode(responseString) as Map;
-    return {
-      "statusCode": response.statusCode,
-      "body": responseData,
-    };
+      final response = await request.send();
+      var responseString = await response.stream.bytesToString();
+      final responseData = jsonDecode(responseString) as Map;
+      return {
+        "statusCode": response.statusCode,
+        "body": responseData,
+      };
+    } catch (error) {
+      return Future.error(error);
+    }
   }
 
   Future<Map> changeProfileName(String profileName) async {
-    final response = await put(
-      Uri.parse(routeUrl + "user/changeProfileName"),
-      body: {"profile_name": profileName},
-      headers: {
-        HttpHeaders.authorizationHeader: "Bearer $token",
-      },
-    );
+    try {
+      final response = await put(
+        Uri.parse(routeUrl + "user/changeProfileName"),
+        body: {"profile_name": profileName},
+        headers: {
+          HttpHeaders.authorizationHeader: "Bearer $token",
+        },
+      );
 
-    final responseData = jsonDecode(response.body);
-    return {
-      "statusCode": response.statusCode,
-      "body": responseData as Map,
-    };
+      final responseData = jsonDecode(response.body);
+      return {
+        "statusCode": response.statusCode,
+        "body": responseData as Map,
+      };
+    } catch (error) {
+      return Future.error(error);
+    }
   }
 
   Future<Map> changeEmail(String email) async {
-    final response = await put(
-      Uri.parse(routeUrl + "user/changeEmail"),
-      body: {"email": email},
-      headers: {
-        HttpHeaders.authorizationHeader: "Bearer $token",
-      },
-    );
+    try {
+      final response = await put(
+        Uri.parse(routeUrl + "user/changeEmail"),
+        body: {"email": email},
+        headers: {
+          HttpHeaders.authorizationHeader: "Bearer $token",
+        },
+      );
 
-    final responseData = jsonDecode(response.body);
-    return {
-      "statusCode": response.statusCode,
-      "body": responseData as Map,
-    };
+      final responseData = jsonDecode(response.body);
+      return {
+        "statusCode": response.statusCode,
+        "body": responseData as Map,
+      };
+    } catch (error) {
+      return Future.error(error);
+    }
   }
 
   Future<Map> changeGender(String gender) async {
-    final response = await put(
-      Uri.parse(routeUrl + "user/changeGender"),
-      body: {"gender": gender},
-      headers: {
-        HttpHeaders.authorizationHeader: "Bearer $token",
-      },
-    );
+    try {
+      final response = await put(
+        Uri.parse(routeUrl + "user/changeGender"),
+        body: {"gender": gender},
+        headers: {
+          HttpHeaders.authorizationHeader: "Bearer $token",
+        },
+      );
 
-    final responseData = jsonDecode(response.body);
-    return {
-      "statusCode": response.statusCode,
-      "body": responseData as Map,
-    };
+      final responseData = jsonDecode(response.body);
+      return {
+        "statusCode": response.statusCode,
+        "body": responseData as Map,
+      };
+    } catch (error) {
+      return Future.error(error);
+    }
   }
 
   Future<Map> publicProgress() async {
-    final response = await get(Uri.parse(routeUrl + "user/progressPublication"),
-        headers: {HttpHeaders.authorizationHeader: "Bearer $token"});
+    try {
+      final response = await get(
+          Uri.parse(routeUrl + "user/progressPublication"),
+          headers: {HttpHeaders.authorizationHeader: "Bearer $token"});
 
-    return jsonDecode(response.body) as Map;
+      return jsonDecode(response.body) as Map;
+    } catch (error) {
+      return Future.error(error);
+    }
   }
 }

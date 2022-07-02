@@ -13,135 +13,167 @@ class IncomeHttp {
   final token = LogStatus.token;
 
   Future<Map> addIncome(AddExpenseIncome incomeDetail) async {
-    Map<String, String> incomeData = {
-      "name": incomeDetail.name!,
-      "amount": incomeDetail.amount!,
-      "category": incomeDetail.category!,
-    };
-    final response = await post(
-      Uri.parse(routeUrl + "income/add"),
-      body: incomeData,
-      headers: {
-        HttpHeaders.authorizationHeader: "Bearer $token",
-      },
-    );
+    try {
+      Map<String, String> incomeData = {
+        "name": incomeDetail.name!,
+        "amount": incomeDetail.amount!,
+        "category": incomeDetail.category!,
+      };
+      final response = await post(
+        Uri.parse(routeUrl + "income/add"),
+        body: incomeData,
+        headers: {
+          HttpHeaders.authorizationHeader: "Bearer $token",
+        },
+      );
 
-    return {
-      "statusCode": response.statusCode,
-      "body": jsonDecode(response.body)
-    };
+      return {
+        "statusCode": response.statusCode,
+        "body": jsonDecode(response.body)
+      };
+    } catch (error) {
+      return Future.error(error);
+    }
   }
 
   Future<IncomeDWM> getIncomeDWM() async {
-    final response = await get(
-      Uri.parse(routeUrl + "income/getDWM"),
-      headers: {
-        HttpHeaders.authorizationHeader: "Bearer $token",
-      },
-    );
+    try {
+      final response = await get(
+        Uri.parse(routeUrl + "income/getDWM"),
+        headers: {
+          HttpHeaders.authorizationHeader: "Bearer $token",
+        },
+      );
 
-    final resData = jsonDecode(response.body);
+      final resData = jsonDecode(response.body);
 
-    return IncomeDWM.fromJson(resData);
+      return IncomeDWM.fromJson(resData);
+    } catch (error) {
+      return Future.error(error);
+    }
   }
 
   Future<IncomeSpecific> getIncomeSpecific(
       String startDate, String endDate) async {
-    final response = await post(
-      Uri.parse(routeUrl + "income/getSpecific"),
-      body: {"startDate": startDate, "endDate": endDate},
-      headers: {
-        HttpHeaders.authorizationHeader: "Bearer $token",
-      },
-    );
+    try {
+      final response = await post(
+        Uri.parse(routeUrl + "income/getSpecific"),
+        body: {"startDate": startDate, "endDate": endDate},
+        headers: {
+          HttpHeaders.authorizationHeader: "Bearer $token",
+        },
+      );
 
-    final resData = jsonDecode(response.body);
+      final resData = jsonDecode(response.body);
 
-    return IncomeSpecific.fromJson(resData);
+      return IncomeSpecific.fromJson(resData);
+    } catch (error) {
+      return Future.error(error);
+    }
   }
 
   Future<Map> removeIncome(String incomeId) async {
-    final response = await delete(
-      Uri.parse(routeUrl + "income/remove"),
-      body: {"incomeId": incomeId},
-      headers: {
-        HttpHeaders.authorizationHeader: "Bearer $token",
-      },
-    );
+    try {
+      final response = await delete(
+        Uri.parse(routeUrl + "income/remove"),
+        body: {"incomeId": incomeId},
+        headers: {
+          HttpHeaders.authorizationHeader: "Bearer $token",
+        },
+      );
 
-    return jsonDecode(response.body) as Map;
+      return jsonDecode(response.body) as Map;
+    } catch (error) {
+      return Future.error(error);
+    }
   }
 
   Future<Map> editIncome(IncomeData income) async {
-    Map<String, String> incomeData = {
-      "incomeId": income.id!,
-      "name": income.name!,
-      "amount": income.amount!.toString(),
-      "category": income.category!,
-    };
+    try {
+      Map<String, String> incomeData = {
+        "incomeId": income.id!,
+        "name": income.name!,
+        "amount": income.amount!.toString(),
+        "category": income.category!,
+      };
 
-    final response = await put(
-      Uri.parse(routeUrl + "income/edit"),
-      body: incomeData,
-      headers: {
-        HttpHeaders.authorizationHeader: "Bearer $token",
-      },
-    );
+      final response = await put(
+        Uri.parse(routeUrl + "income/edit"),
+        body: incomeData,
+        headers: {
+          HttpHeaders.authorizationHeader: "Bearer $token",
+        },
+      );
 
-    return {
-      "statusCode": response.statusCode,
-      "body": jsonDecode(response.body)
-    };
+      return {
+        "statusCode": response.statusCode,
+        "body": jsonDecode(response.body)
+      };
+    } catch (error) {
+      return Future.error(error);
+    }
   }
 
   Future<List<IncomeData>> getCategorizedIncome(String category) async {
-    final response = await post(
-      Uri.parse(routeUrl + "income/categorized"),
-      body: {
-        "category": category,
-      },
-      headers: {
-        HttpHeaders.authorizationHeader: "Bearer $token",
-      },
-    );
+    try {
+      final response = await post(
+        Uri.parse(routeUrl + "income/categorized"),
+        body: {
+          "category": category,
+        },
+        headers: {
+          HttpHeaders.authorizationHeader: "Bearer $token",
+        },
+      );
 
-    List resData = jsonDecode(response.body);
+      List resData = jsonDecode(response.body);
 
-    return resData.map((e) => IncomeData.fromJson(e)).toList();
+      return resData.map((e) => IncomeData.fromJson(e)).toList();
+    } catch (error) {
+      return Future.error(error);
+    }
   }
 
   Future<List<IncomeData>> getCategorizedSpecificIncome(
       String category, String startDate, String endDate) async {
-    Map<String, String> incomeData = {
-      "startDate": startDate,
-      "endDate": endDate,
-      "category": category,
-    };
+    try {
+      Map<String, String> incomeData = {
+        "startDate": startDate,
+        "endDate": endDate,
+        "category": category,
+      };
 
-    final response = await post(
-      Uri.parse(routeUrl + "income/categorizedSpecific"),
-      body: incomeData,
-      headers: {
-        HttpHeaders.authorizationHeader: "Bearer $token",
-      },
-    );
+      final response = await post(
+        Uri.parse(routeUrl + "income/categorizedSpecific"),
+        body: incomeData,
+        headers: {
+          HttpHeaders.authorizationHeader: "Bearer $token",
+        },
+      );
 
-    List resData = jsonDecode(response.body);
+      List resData = jsonDecode(response.body);
 
-    return resData.map((e) => IncomeData.fromJson(e)).toList();
+      return resData.map((e) => IncomeData.fromJson(e)).toList();
+    } catch (error) {
+      return Future.error(error);
+    }
   }
 
   Future<String> getCategoryStartDate(String category) async {
-    final response = await post(
-      Uri.parse(routeUrl + "income/getCategoryStartDate"),
-      body: {
-        "category": category,
-      },
-      headers: {
-        HttpHeaders.authorizationHeader: "Bearer $token",
-      },
-    );
+    try {
+      final response = await post(
+        Uri.parse(routeUrl + "income/getCategoryStartDate"),
+        body: {
+          "category": category,
+        },
+        headers: {
+          HttpHeaders.authorizationHeader: "Bearer $token",
+        },
+      );
 
-    return response.body;
+      return response.body;
+    } catch (error) {
+      return Future.error(error);
+    }
   }
 }
