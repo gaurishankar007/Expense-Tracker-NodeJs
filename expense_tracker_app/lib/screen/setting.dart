@@ -61,6 +61,7 @@ class _SettingState extends State<Setting> {
   @override
   Widget build(BuildContext context) {
     final sWidth = MediaQuery.of(context).size.width;
+    final sHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       appBar: AppBar(
@@ -90,244 +91,283 @@ class _SettingState extends State<Setting> {
           bottom: 25,
           left: sWidth * .05,
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            SizedBox(
-              height: 5,
-            ),
-            FutureBuilder<User>(
-                future: getUser,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return Column(
-                      children: [
-                        Stack(
-                          alignment: Alignment.bottomRight,
-                          children: [
-                            CircleAvatar(
-                              radius: 100,
-                              backgroundImage: NetworkImage(
-                                  profilePic + snapshot.data!.profilePicture!),
+        child: FutureBuilder<User>(
+          future: getUser,
+          builder: (context, snapshot) {
+            List<Widget> children = [];
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              children = <Widget>[
+                Container(
+                  width: sWidth * 0.97,
+                  height: sHeight,
+                  alignment: Alignment.center,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 3,
+                    color: AppColors.primary,
+                  ),
+                )
+              ];
+            } else if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.hasData) {
+                children = <Widget>[
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Stack(
+                    alignment: Alignment.bottomRight,
+                    children: [
+                      CircleAvatar(
+                        radius: 100,
+                        backgroundImage: NetworkImage(
+                            profilePic + snapshot.data!.profilePicture!),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          _pickProfileImg();
+                        },
+                        child: Icon(
+                          Icons.edit,
+                          color: AppColors.text,
+                          size: 25,
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.all(4),
+                          minimumSize: Size.zero,
+                          primary: Colors.white,
+                          elevation: 10,
+                          shadowColor: Colors.black,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Text(
+                    snapshot.data!.profileName!,
+                    style: TextStyle(
+                      color: AppColors.text,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 25,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => UserSetting(),
                             ),
-                            ElevatedButton(
-                              onPressed: () {
-                                _pickProfileImg();
-                              },
-                              child: Icon(
-                                Icons.edit,
+                          );
+                        },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Profile",
+                              style: TextStyle(
                                 color: AppColors.text,
-                                size: 25,
+                                fontWeight: FontWeight.bold,
                               ),
-                              style: ElevatedButton.styleFrom(
-                                padding: EdgeInsets.all(4),
-                                minimumSize: Size.zero,
-                                primary: Colors.white,
-                                elevation: 10,
-                                shadowColor: Colors.black,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Text("Update your personal information."),
+                          ],
+                        ),
+                      ),
+                      Icon(
+                        Icons.person,
+                        color: AppColors.primary,
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 25,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => PasswordSetting(),
+                        ),
+                      );
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Password",
+                              style: TextStyle(
+                                color: AppColors.text,
+                                fontWeight: FontWeight.bold,
                               ),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Text("Change your password."),
+                          ],
+                        ),
+                        Icon(
+                          Icons.key,
+                          color: AppColors.primary,
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: 25,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Profile Publication",
+                            style: TextStyle(
+                              color: AppColors.text,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            "Publish Profile Information",
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        width: 25,
+                        child: Switch(
+                          activeColor: AppColors.primary,
+                          value: progressPublication,
+                          onChanged: (value) async {
+                            final resData = await UserHttp().publicProgress();
+                            Fluttertoast.showToast(
+                              msg: resData["resM"],
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.TOP,
+                              timeInSecForIosWeb: 2,
+                              backgroundColor: Colors.white,
+                              textColor: Colors.black,
+                              fontSize: 16.0,
+                            );
+                            setState(() {
+                              progressPublication = value;
+                            });
+                          },
+                        ),
+                      )
+                    ],
+                  ),
+                  SizedBox(
+                    height: 25,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      LogStatus().removeToken();
+                      LogStatus.token = "";
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (builder) => Login(),
+                        ),
+                        (route) => false,
+                      );
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Log out",
+                              style: TextStyle(
+                                color: AppColors.text,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Text(
+                              "You are currently logged in",
                             ),
                           ],
                         ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Text(
-                          snapshot.data!.profileName!,
-                          style: TextStyle(
-                            color: AppColors.text,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                          ),
+                        Icon(
+                          Icons.logout_outlined,
+                          color: AppColors.primary,
                         ),
                       ],
-                    );
-                  } else if (snapshot.hasError) {
-                    return Center(
+                    ),
+                  ),
+                ];
+              } else if (snapshot.hasError) {
+                if ("${snapshot.error}".split("Exception: ")[0] == "Socket") {
+                  children = <Widget>[
+                    Container(
+                      width: sWidth,
+                      height: sHeight,
+                      alignment: Alignment.center,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(
+                            Icons.warning_rounded,
+                            size: 25,
+                            color: Colors.red,
+                          ),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Text(
+                            "Connection Problem",
+                            style: TextStyle(
+                                fontSize: 15, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ];
+                } else {
+                  children = <Widget>[
+                    Container(
+                      width: sWidth,
+                      height: sHeight,
+                      alignment: Alignment.center,
                       child: Text(
                         "${snapshot.error}",
                         style: TextStyle(
                           fontSize: 15,
                         ),
                       ),
-                    );
-                  }
-                  return Center(
-                    child: CircularProgressIndicator(
-                      strokeWidth: 5,
-                      color: AppColors.primary,
-                    ),
-                  );
-                }),
-            SizedBox(
-              height: 25,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => UserSetting(),
-                      ),
-                    );
-                  },
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Profile",
-                        style: TextStyle(
-                          color: AppColors.text,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      Text("Update your personal information."),
-                    ],
-                  ),
-                ),
-                Icon(
-                  Icons.person,
-                  color: AppColors.primary,
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 25,
-            ),
-            GestureDetector(
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => PasswordSetting(),
-                  ),
-                );
-              },
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Password",
-                        style: TextStyle(
-                          color: AppColors.text,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      Text("Change your password."),
-                    ],
-                  ),
-                  Icon(
-                    Icons.key,
-                    color: AppColors.primary,
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 25,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Profile Publication",
-                      style: TextStyle(
-                        color: AppColors.text,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Text(
-                      "Publish Profile Information",
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  width: 25,
-                  child: Switch(
-                    activeColor: AppColors.primary,
-                    value: progressPublication,
-                    onChanged: (value) async {
-                      final resData = await UserHttp().publicProgress();
-                      Fluttertoast.showToast(
-                        msg: resData["resM"],
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.TOP,
-                        timeInSecForIosWeb: 2,
-                        backgroundColor: Colors.white,
-                        textColor: Colors.black,
-                        fontSize: 16.0,
-                      );
-                      setState(() {
-                        progressPublication = value;
-                      });
-                    },
-                  ),
-                )
-              ],
-            ),
-            SizedBox(
-              height: 25,
-            ),
-            GestureDetector(
-              onTap: () {
-                LogStatus().removeToken();
-                LogStatus.token = "";
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (builder) => Login(),
-                  ),
-                  (route) => false,
-                );
-              },
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Log out",
-                        style: TextStyle(
-                          color: AppColors.text,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      Text(
-                        "You are currently logged in",
-                      ),
-                    ],
-                  ),
-                  Icon(
-                    Icons.logout_outlined,
-                    color: AppColors.primary,
-                  ),
-                ],
-              ),
-            ),
-          ],
+                    )
+                  ];
+                }
+              }
+            }
+            return Column(
+              children: children,
+            );
+          },
         ),
       ),
     );

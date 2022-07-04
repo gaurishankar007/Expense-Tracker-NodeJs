@@ -22,11 +22,7 @@ class Income extends StatefulWidget {
 class _IncomeState extends State<Income> {
   final routeUrl = ApiUrls.routeUrl;
   final _formKey = GlobalKey<FormState>();
-  String name = "",
-      amount = "",
-      category = "Other",
-      startDate = "",
-      endDate = "";
+  String name = "", amount = "", category = "Other";
 
   OutlineInputBorder formBorder = OutlineInputBorder(
     borderRadius: BorderRadius.circular(5),
@@ -124,10 +120,11 @@ class _IncomeState extends State<Income> {
                           IconButton(
                             onPressed: () {
                               showDialog(
-                                  context: context,
-                                  builder: (ctx) {
-                                    return addIncome(context);
-                                  });
+                                context: context,
+                                builder: (ctx) {
+                                  return addIncome(context);
+                                },
+                              );
                             },
                             icon: Icon(
                               Icons.add,
@@ -137,294 +134,7 @@ class _IncomeState extends State<Income> {
                           )
                         ],
                       ),
-                      Row(
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              if (incomeIndex == 0) {
-                                return;
-                              }
-
-                              userIncomeDetails.then((value) {
-                                setState(() {
-                                  incomeList = value.todayIncomes!;
-                                  incomeAmount = value.todayIncomeAmount!;
-                                  incomeCategoryList =
-                                      value.todayIncomeCategories!;
-                                  incomeIndex = 0;
-                                  touchedIndex = 0;
-                                });
-                              });
-                            },
-                            child: Text(
-                              "Today",
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              primary: incomeIndex == 0
-                                  ? AppColors.primary
-                                  : AppColors.button,
-                              minimumSize: Size.zero,
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 8,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              if (incomeIndex == 1) {
-                                return;
-                              }
-
-                              userIncomeDetails.then((value) {
-                                setState(() {
-                                  incomeList = value.thisWeekIncomes!;
-                                  incomeAmount = value.thisWeekIncomeAmount!;
-                                  incomeCategoryList =
-                                      value.thisWeekIncomeCategories!;
-                                  incomeIndex = 1;
-                                  touchedIndex = 0;
-                                });
-                              });
-                            },
-                            child: Text(
-                              "This Week",
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              primary: incomeIndex == 1
-                                  ? AppColors.primary
-                                  : AppColors.button,
-                              minimumSize: Size.zero,
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 8,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              if (incomeIndex == 2) {
-                                return;
-                              }
-
-                              userIncomeDetails.then((value) {
-                                setState(() {
-                                  incomeList = value.thisMonthIncomes!;
-                                  incomeAmount = value.thisMonthIncomeAmount!;
-                                  incomeCategoryList =
-                                      value.thisMonthIncomeCategories!;
-                                  incomeIndex = 2;
-                                  touchedIndex = 0;
-                                });
-                              });
-                            },
-                            child: Text(
-                              "This Month",
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              primary: incomeIndex == 2
-                                  ? AppColors.primary
-                                  : AppColors.button,
-                              minimumSize: Size.zero,
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 8,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              if (incomeIndex == 3) {
-                                return;
-                              }
-
-                              setState(() {
-                                incomeList = [];
-                                incomeAmount = 0;
-                                incomeCategoryList = [];
-                                incomeIndex = 3;
-                                touchedIndex = 0;
-                              });
-                            },
-                            child: Text(
-                              "Select",
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              primary: incomeIndex == 3
-                                  ? AppColors.primary
-                                  : AppColors.button,
-                              minimumSize: Size.zero,
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 8,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                      incomeIndex == 3
-                          ? Padding(
-                              padding: EdgeInsets.symmetric(
-                                vertical: 10,
-                              ),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      SizedBox(
-                                        width: sWidth * .45,
-                                        height: 60,
-                                        child: DateTimeField(
-                                          onChanged: (value) {
-                                            startDate =
-                                                value.toString().split(" ")[0];
-                                          },
-                                          format: DateFormat("yyyy-MM-dd"),
-                                          onShowPicker:
-                                              (context, currentValue) {
-                                            return showDatePicker(
-                                              context: context,
-                                              firstDate: DateTime(
-                                                int.parse(snapshot
-                                                    .data!.firstIncomeDate!
-                                                    .split("-")[0]),
-                                                int.parse(snapshot
-                                                    .data!.firstIncomeDate!
-                                                    .split("-")[1]),
-                                                int.parse(snapshot
-                                                    .data!.firstIncomeDate!
-                                                    .split("-")[2]),
-                                              ),
-                                              initialDate: currentValue ??
-                                                  DateTime.now(),
-                                              lastDate: DateTime.now(),
-                                            );
-                                          },
-                                          decoration: InputDecoration(
-                                            filled: true,
-                                            fillColor: AppColors.form,
-                                            hintText: "Start Date",
-                                            enabledBorder: formBorder,
-                                            focusedBorder: formBorder,
-                                            errorBorder: formBorder,
-                                            focusedErrorBorder: formBorder,
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: sWidth * .45,
-                                        height: 60,
-                                        child: DateTimeField(
-                                          onChanged: (value) {
-                                            endDate =
-                                                value.toString().split(" ")[0];
-                                          },
-                                          format: DateFormat("yyyy-MM-dd"),
-                                          onShowPicker:
-                                              (context, currentValue) {
-                                            return showDatePicker(
-                                              context: context,
-                                              firstDate: DateTime(
-                                                int.parse(snapshot
-                                                    .data!.firstIncomeDate!
-                                                    .split("-")[0]),
-                                                int.parse(snapshot
-                                                    .data!.firstIncomeDate!
-                                                    .split("-")[1]),
-                                                int.parse(snapshot
-                                                    .data!.firstIncomeDate!
-                                                    .split("-")[2]),
-                                              ),
-                                              initialDate: currentValue ??
-                                                  DateTime.now(),
-                                              lastDate: DateTime.now(),
-                                            );
-                                          },
-                                          decoration: InputDecoration(
-                                            filled: true,
-                                            fillColor: AppColors.form,
-                                            hintText: "End Date",
-                                            enabledBorder: formBorder,
-                                            focusedBorder: formBorder,
-                                            errorBorder: formBorder,
-                                            focusedErrorBorder: formBorder,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: () async {
-                                      if (startDate == "" ||
-                                          startDate == "null" ||
-                                          endDate == "" ||
-                                          endDate == "null") {
-                                        Fluttertoast.showToast(
-                                          msg:
-                                              "Both start and end date is required.",
-                                          toastLength: Toast.LENGTH_SHORT,
-                                          gravity: ToastGravity.BOTTOM,
-                                          timeInSecForIosWeb: 3,
-                                          backgroundColor: Colors.red,
-                                          textColor: Colors.white,
-                                          fontSize: 16.0,
-                                        );
-                                      } else {
-                                        IncomeSpecific resData =
-                                            await IncomeHttp()
-                                                .getIncomeSpecific(
-                                                    startDate, endDate);
-
-                                        setState(() {
-                                          incomeList = resData.incomes!;
-                                          incomeAmount = resData.incomeAmount!;
-                                          incomeCategoryList =
-                                              resData.incomeCategories!;
-                                        });
-                                      }
-                                    },
-                                    child: Text(
-                                      "Search",
-                                    ),
-                                    style: ElevatedButton.styleFrom(
-                                      primary: AppColors.primary,
-                                      minimumSize: Size.zero,
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 8,
-                                      ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            )
-                          : SizedBox(),
+                      getButtons(context, snapshot.data!.firstIncomeDate!),
                       viewIncome(
                         context,
                         incomeList,
@@ -566,7 +276,7 @@ class _IncomeState extends State<Income> {
                 ),
                 decoration: BoxDecoration(
                   color: AppColors.form,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(5),
                 ),
                 child: DropdownButton(
                   value: category,
@@ -578,7 +288,7 @@ class _IncomeState extends State<Income> {
                   ),
                   isExpanded: true,
                   dropdownColor: AppColors.form,
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(5),
                   onChanged: (String? newValue) {
                     setState1(() {
                       category = newValue!;
@@ -604,7 +314,7 @@ class _IncomeState extends State<Income> {
               elevation: 10,
               shadowColor: Colors.black,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(5),
               ),
             ),
             onPressed: () async {
@@ -629,7 +339,7 @@ class _IncomeState extends State<Income> {
                     gravity: ToastGravity.TOP,
                     timeInSecForIosWeb: 3,
                     backgroundColor: Colors.green,
-                    textColor: Colors.white,
+                    textColor: AppColors.primary,
                     fontSize: 16.0,
                   );
                 } else {
@@ -639,7 +349,7 @@ class _IncomeState extends State<Income> {
                     gravity: ToastGravity.TOP,
                     timeInSecForIosWeb: 3,
                     backgroundColor: Colors.red,
-                    textColor: Colors.white,
+                    textColor: AppColors.primary,
                     fontSize: 16.0,
                   );
                 }
@@ -650,7 +360,7 @@ class _IncomeState extends State<Income> {
                   gravity: ToastGravity.BOTTOM,
                   timeInSecForIosWeb: 3,
                   backgroundColor: Colors.red,
-                  textColor: Colors.white,
+                  textColor: AppColors.primary,
                   fontSize: 16.0,
                 );
               }
@@ -665,7 +375,7 @@ class _IncomeState extends State<Income> {
               elevation: 10,
               shadowColor: Colors.black,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(5),
               ),
             ),
             onPressed: () {
@@ -677,6 +387,291 @@ class _IncomeState extends State<Income> {
         ],
       );
     });
+  }
+
+  Widget getButtons(BuildContext context, String firstDate) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ElevatedButton(
+          onPressed: () {
+            if (incomeIndex == 0) {
+              return;
+            }
+
+            userIncomeDetails.then((value) {
+              setState(() {
+                incomeList = value.todayIncomes!;
+                incomeAmount = value.todayIncomeAmount!;
+                incomeCategoryList = value.todayIncomeCategories!;
+                incomeIndex = 0;
+                touchedIndex = 0;
+              });
+            });
+          },
+          child: Text(
+            "Today",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          style: ElevatedButton.styleFrom(
+            primary: incomeIndex == 0 ? AppColors.primary : AppColors.button,
+            onPrimary: incomeIndex == 0 ? AppColors.onPrimary : AppColors.text,
+            minimumSize: Size.zero,
+            padding: EdgeInsets.symmetric(
+              horizontal: 10,
+              vertical: 8,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(5),
+            ),
+          ),
+        ),
+        SizedBox(
+          width: 10,
+        ),
+        ElevatedButton(
+          onPressed: () {
+            if (incomeIndex == 1) {
+              return;
+            }
+
+            userIncomeDetails.then((value) {
+              setState(() {
+                incomeList = value.thisWeekIncomes!;
+                incomeAmount = value.thisWeekIncomeAmount!;
+                incomeCategoryList = value.thisWeekIncomeCategories!;
+                incomeIndex = 1;
+                touchedIndex = 0;
+              });
+            });
+          },
+          child: Text(
+            "This Week",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          style: ElevatedButton.styleFrom(
+            primary: incomeIndex == 1 ? AppColors.primary : AppColors.button,
+            onPrimary: incomeIndex == 1 ? AppColors.onPrimary : AppColors.text,
+            minimumSize: Size.zero,
+            padding: EdgeInsets.symmetric(
+              horizontal: 10,
+              vertical: 8,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(5),
+            ),
+          ),
+        ),
+        SizedBox(
+          width: 10,
+        ),
+        ElevatedButton(
+          onPressed: () {
+            if (incomeIndex == 2) {
+              return;
+            }
+
+            userIncomeDetails.then((value) {
+              setState(() {
+                incomeList = value.thisMonthIncomes!;
+                incomeAmount = value.thisMonthIncomeAmount!;
+                incomeCategoryList = value.thisMonthIncomeCategories!;
+                incomeIndex = 2;
+                touchedIndex = 0;
+              });
+            });
+          },
+          child: Text(
+            "This Month",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          style: ElevatedButton.styleFrom(
+            primary: incomeIndex == 2 ? AppColors.primary : AppColors.button,
+            onPrimary: incomeIndex == 2 ? AppColors.onPrimary : AppColors.text,
+            minimumSize: Size.zero,
+            padding: EdgeInsets.symmetric(
+              horizontal: 10,
+              vertical: 8,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(5),
+            ),
+          ),
+        ),
+        SizedBox(
+          width: 10,
+        ),
+        ElevatedButton(
+          onPressed: () {
+            setState(() {
+              incomeList = [];
+              incomeAmount = 0;
+              incomeCategoryList = [];
+              incomeIndex = 3;
+              touchedIndex = 0;
+            });
+
+            showDialog(
+              context: context,
+              builder: (ctx) {
+                return selectDate(context, firstDate);
+              },
+            );
+          },
+          child: Text(
+            "Select",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          style: ElevatedButton.styleFrom(
+            primary: incomeIndex == 3 ? AppColors.primary : AppColors.button,
+            onPrimary: incomeIndex == 3 ? AppColors.onPrimary : AppColors.text,
+            minimumSize: Size.zero,
+            padding: EdgeInsets.symmetric(
+              horizontal: 10,
+              vertical: 8,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(5),
+            ),
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget selectDate(BuildContext context, String firstDate) {
+    String startDate = "", endDate = "";
+
+    return SimpleDialog(
+      children: [
+        SimpleDialogOption(
+          padding: EdgeInsets.only(
+            top: 5,
+            left: 15,
+            right: 15,
+          ),
+          child: Column(
+            children: [
+              DateTimeField(
+                onChanged: (value) {
+                  startDate = value.toString().split(" ")[0];
+                },
+                format: DateFormat("yyyy-MM-dd"),
+                onShowPicker: (context, currentValue) {
+                  return showDatePicker(
+                    context: context,
+                    firstDate: DateTime(
+                      int.parse(firstDate.split("-")[0]),
+                      int.parse(firstDate.split("-")[1]),
+                      int.parse(firstDate.split("-")[2]),
+                    ),
+                    initialDate: currentValue ?? DateTime.now(),
+                    lastDate: DateTime.now(),
+                  );
+                },
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: AppColors.form,
+                  hintText: "Start Date",
+                  enabledBorder: formBorder,
+                  focusedBorder: formBorder,
+                  errorBorder: formBorder,
+                  focusedErrorBorder: formBorder,
+                ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              DateTimeField(
+                onChanged: (value) {
+                  endDate = value.toString().split(" ")[0];
+                },
+                format: DateFormat("yyyy-MM-dd"),
+                onShowPicker: (context, currentValue) {
+                  return showDatePicker(
+                    context: context,
+                    firstDate: DateTime(
+                      int.parse(firstDate.split("-")[0]),
+                      int.parse(firstDate.split("-")[1]),
+                      int.parse(firstDate.split("-")[2]),
+                    ),
+                    initialDate: currentValue ?? DateTime.now(),
+                    lastDate: DateTime.now(),
+                  );
+                },
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: AppColors.form,
+                  hintText: "End Date",
+                  enabledBorder: formBorder,
+                  focusedBorder: formBorder,
+                  errorBorder: formBorder,
+                  focusedErrorBorder: formBorder,
+                ),
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  if (startDate == "" ||
+                      startDate == "null" ||
+                      endDate == "" ||
+                      endDate == "null") {
+                    Fluttertoast.showToast(
+                      msg: "Both start and end date is required.",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                      timeInSecForIosWeb: 3,
+                      backgroundColor: Colors.red,
+                      textColor: AppColors.primary,
+                      fontSize: 16.0,
+                    );
+                  } else {
+                    IncomeSpecific resData = await IncomeHttp()
+                        .getIncomeSpecific(startDate, endDate);
+
+                    setState(() {
+                      incomeList = resData.incomes!;
+                      incomeAmount = resData.incomeAmount!;
+                      incomeCategoryList = resData.incomeCategories!;
+                    });
+
+                    Navigator.pop(context);
+                  }
+                },
+                child: Text(
+                  "Search",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  primary: AppColors.primary,
+                  onPrimary: AppColors.onPrimary,
+                  minimumSize: Size.zero,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      ],
+    );
   }
 
   Widget viewIncome(
@@ -706,64 +701,6 @@ class _IncomeState extends State<Income> {
                 ),
               ],
             ),
-          ),
-          ListView.builder(
-            physics: NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            itemCount: category.length,
-            itemBuilder: ((context, index) {
-              return Padding(
-                padding: EdgeInsets.symmetric(vertical: 3),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: IncomeCategoryColors.colorList[Category
-                          .incomeCategory
-                          .indexOf(category[index].category!)],
-                      radius: 8,
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Text(
-                      category[index].category! +
-                          " (Rs. ${category[index].amount})",
-                      style: TextStyle(
-                        color: AppColors.text,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }),
-          ),
-          SizedBox(
-            height: 4,
-          ),
-          Row(
-            children: [
-              Container(
-                height: 15,
-                width: 15,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.all(Radius.circular(2)),
-                ),
-              ),
-              SizedBox(
-                width: 5,
-              ),
-              Text(
-                "Total (Rs. ${amount.toString()})",
-                style: TextStyle(
-                  color: AppColors.text,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-            ],
           ),
           SizedBox(
             width: sWidth * .5,
@@ -795,7 +732,7 @@ class _IncomeState extends State<Income> {
                       final isTouched = index == touchedIndex;
                       final double fontSize = isTouched ? 20 : 15;
                       final double radius =
-                          isTouched ? sWidth * .20 : sWidth * .16;
+                          isTouched ? sWidth * .18 : sWidth * .16;
 
                       final pieData = PieChartSectionData(
                         value: double.parse(
@@ -806,7 +743,7 @@ class _IncomeState extends State<Income> {
                             Category.incomeCategory.indexOf(data.category!)],
                         radius: radius,
                         titleStyle: TextStyle(
-                          color: Colors.white,
+                          color: AppColors.onPrimary,
                           fontSize: fontSize,
                           fontWeight: FontWeight.bold,
                         ),
@@ -820,7 +757,66 @@ class _IncomeState extends State<Income> {
             ),
           ),
           SizedBox(
-            height: 4,
+            height: 5,
+          ),
+          ListView.builder(
+            physics: NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: category.length,
+            itemBuilder: ((context, index) {
+              return Padding(
+                padding: EdgeInsets.symmetric(vertical: 3),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: ExpenseCategoryColors.colorList[Category
+                          .incomeCategory
+                          .indexOf(category[index].category!)],
+                      radius: 6,
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    RichText(
+                      text: TextSpan(
+                        text: category[index].category!,
+                        style: TextStyle(
+                          color: AppColors.text,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              );
+            }),
+          ),
+          Row(
+            children: [
+              RichText(
+                text: TextSpan(
+                  text: "= ",
+                  style: TextStyle(
+                    color: AppColors.text,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: "Rs.${amount.toString()}",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
+          SizedBox(
+            height: 15,
           ),
           Row(
             children: [
@@ -904,7 +900,7 @@ class _IncomeState extends State<Income> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "No income yet",
+              "No incomes",
               style: TextStyle(
                 color: AppColors.text,
                 fontWeight: FontWeight.bold,
@@ -918,7 +914,7 @@ class _IncomeState extends State<Income> {
                 elevation: 10,
                 shadowColor: Colors.black,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(5),
                 ),
               ),
               onPressed: () {
@@ -962,7 +958,7 @@ class _IncomeState extends State<Income> {
         horizontal: MediaQuery.of(context).size.width * .20,
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.onPrimary,
         borderRadius: BorderRadius.only(
           topLeft: const Radius.circular(15.0),
           topRight: const Radius.circular(15.0),
@@ -988,7 +984,7 @@ class _IncomeState extends State<Income> {
               elevation: 10,
               shadowColor: Colors.black,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(5),
               ),
             ),
             onPressed: () {
@@ -1029,7 +1025,7 @@ class _IncomeState extends State<Income> {
               elevation: 10,
               shadowColor: Colors.black,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(5),
               ),
             ),
             onPressed: () async {
@@ -1041,7 +1037,7 @@ class _IncomeState extends State<Income> {
                 toastLength: Toast.LENGTH_SHORT,
                 gravity: ToastGravity.TOP,
                 timeInSecForIosWeb: 3,
-                backgroundColor: Colors.white,
+                backgroundColor: AppColors.primary,
                 textColor: Colors.black,
                 fontSize: 16.0,
               );
@@ -1125,7 +1121,7 @@ class _IncomeState extends State<Income> {
                 ),
                 decoration: BoxDecoration(
                   color: AppColors.form,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(5),
                 ),
                 child: DropdownButton(
                   value: categoryTEC,
@@ -1137,7 +1133,7 @@ class _IncomeState extends State<Income> {
                   ),
                   isExpanded: true,
                   dropdownColor: AppColors.form,
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(5),
                   onChanged: (String? newValue) {
                     setState1(() {
                       categoryTEC = newValue!;
@@ -1163,7 +1159,7 @@ class _IncomeState extends State<Income> {
               elevation: 10,
               shadowColor: Colors.black,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(5),
               ),
             ),
             onPressed: () async {
@@ -1189,7 +1185,7 @@ class _IncomeState extends State<Income> {
                     gravity: ToastGravity.TOP,
                     timeInSecForIosWeb: 3,
                     backgroundColor: Colors.green,
-                    textColor: Colors.white,
+                    textColor: AppColors.primary,
                     fontSize: 16.0,
                   );
                 } else {
@@ -1199,7 +1195,7 @@ class _IncomeState extends State<Income> {
                     gravity: ToastGravity.TOP,
                     timeInSecForIosWeb: 3,
                     backgroundColor: Colors.red,
-                    textColor: Colors.white,
+                    textColor: AppColors.primary,
                     fontSize: 16.0,
                   );
                 }
@@ -1210,7 +1206,7 @@ class _IncomeState extends State<Income> {
                   gravity: ToastGravity.BOTTOM,
                   timeInSecForIosWeb: 3,
                   backgroundColor: Colors.red,
-                  textColor: Colors.white,
+                  textColor: AppColors.primary,
                   fontSize: 16.0,
                 );
               }
@@ -1225,7 +1221,7 @@ class _IncomeState extends State<Income> {
               elevation: 10,
               shadowColor: Colors.black,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(5),
               ),
             ),
             onPressed: () {

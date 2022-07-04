@@ -137,7 +137,7 @@ class _CategorizedExpenseState extends State<CategorizedExpense> {
                                           "${widget.category} (Rs. $expenseAmount)",
                                       style: TextStyle(
                                         fontSize: 18,
-                                        color: Colors.white,
+                                        color: AppColors.onPrimary,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -153,7 +153,7 @@ class _CategorizedExpenseState extends State<CategorizedExpense> {
                               },
                               icon: Icon(
                                 Icons.arrow_back_outlined,
-                                color: Colors.white,
+                                color: AppColors.onPrimary,
                                 size: 25,
                               ),
                             ),
@@ -201,6 +201,7 @@ class _CategorizedExpenseState extends State<CategorizedExpense> {
             left: sWidth * 0.03,
           ),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ElevatedButton(
                 onPressed: () async {
@@ -228,13 +229,15 @@ class _CategorizedExpenseState extends State<CategorizedExpense> {
                 style: ElevatedButton.styleFrom(
                   primary:
                       expenseIndex == 0 ? AppColors.primary : AppColors.button,
+                  onPrimary:
+                      expenseIndex == 0 ? AppColors.onPrimary : AppColors.text,
                   minimumSize: Size.zero,
                   padding: EdgeInsets.symmetric(
                     horizontal: 10,
                     vertical: 8,
                   ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(5),
                   ),
                 ),
               ),
@@ -243,15 +246,16 @@ class _CategorizedExpenseState extends State<CategorizedExpense> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  if (expenseIndex == 1) {
-                    return;
-                  }
-
                   setState(() {
                     expenseList = [];
                     expenseAmount = 0;
                     expenseIndex = 1;
                   });
+
+                  showDialog(
+                    context: context,
+                    builder: (builder) => selectDate(context, firstDate),
+                  );
                 },
                 child: Text(
                   "Select",
@@ -259,146 +263,154 @@ class _CategorizedExpenseState extends State<CategorizedExpense> {
                 style: ElevatedButton.styleFrom(
                   primary:
                       expenseIndex == 1 ? AppColors.primary : AppColors.button,
+                  onPrimary:
+                      expenseIndex == 1 ? AppColors.onPrimary : AppColors.text,
                   minimumSize: Size.zero,
                   padding: EdgeInsets.symmetric(
                     horizontal: 10,
                     vertical: 8,
                   ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                ),
+              )
+            ],
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget selectDate(BuildContext context, String firstDate) {
+    String startDate = "", endDate = "";
+
+    return SimpleDialog(
+      children: [
+        SimpleDialogOption(
+          padding: EdgeInsets.only(
+            top: 5,
+            left: 15,
+            right: 15,
+          ),
+          child: Column(
+            children: [
+              DateTimeField(
+                onChanged: (value) {
+                  startDate = value.toString().split(" ")[0];
+                },
+                format: DateFormat("yyyy-MM-dd"),
+                onShowPicker: (context, currentValue) {
+                  return showDatePicker(
+                    context: context,
+                    firstDate: DateTime(
+                      int.parse(firstDate.split("-")[0]),
+                      int.parse(firstDate.split("-")[1]),
+                      int.parse(firstDate.split("-")[2]),
+                    ),
+                    initialDate: currentValue ?? DateTime.now(),
+                    lastDate: DateTime.now(),
+                  );
+                },
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: AppColors.form,
+                  hintText: "Start Date",
+                  enabledBorder: formBorder,
+                  focusedBorder: formBorder,
+                  errorBorder: formBorder,
+                  focusedErrorBorder: formBorder,
+                ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              DateTimeField(
+                onChanged: (value) {
+                  endDate = value.toString().split(" ")[0];
+                },
+                format: DateFormat("yyyy-MM-dd"),
+                onShowPicker: (context, currentValue) {
+                  return showDatePicker(
+                    context: context,
+                    firstDate: DateTime(
+                      int.parse(firstDate.split("-")[0]),
+                      int.parse(firstDate.split("-")[1]),
+                      int.parse(firstDate.split("-")[2]),
+                    ),
+                    initialDate: currentValue ?? DateTime.now(),
+                    lastDate: DateTime.now(),
+                  );
+                },
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: AppColors.form,
+                  hintText: "End Date",
+                  enabledBorder: formBorder,
+                  focusedBorder: formBorder,
+                  errorBorder: formBorder,
+                  focusedErrorBorder: formBorder,
+                ),
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  if (startDate == "" ||
+                      startDate == "null" ||
+                      endDate == "" ||
+                      endDate == "null") {
+                    Fluttertoast.showToast(
+                      msg: "Both start and end date is required.",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                      timeInSecForIosWeb: 3,
+                      backgroundColor: Colors.red,
+                      textColor: AppColors.primary,
+                      fontSize: 16.0,
+                    );
+                  } else {
+                    List<ExpenseData> tempExpenseList = await ExpenseHttp()
+                        .getCategorizedSpecificExpense(
+                            widget.category!, startDate, endDate);
+
+                    int tempExpenseAmount = 0;
+                    for (int i = 0; i < tempExpenseList.length; i++) {
+                      tempExpenseAmount =
+                          tempExpenseAmount + tempExpenseList[i].amount!;
+                    }
+
+                    setState(() {
+                      expenseList = tempExpenseList;
+                      expenseAmount = tempExpenseAmount;
+                    });
+
+                    Navigator.pop(context);
+                  }
+                },
+                child: Text(
+                  "Search",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  primary: AppColors.primary,
+                  onPrimary: AppColors.onPrimary,
+                  minimumSize: Size.zero,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
                   ),
                 ),
               )
             ],
           ),
         ),
-        expenseIndex == 1
-            ? Padding(
-                padding: EdgeInsets.only(
-                  right: sWidth * 0.03,
-                  top: 5,
-                  left: sWidth * 0.03,
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(
-                          width: sWidth * .45,
-                          height: 60,
-                          child: DateTimeField(
-                            onChanged: (value) {
-                              startDate = value.toString().split(" ")[0];
-                            },
-                            format: DateFormat("yyyy-MM-dd"),
-                            onShowPicker: (context, currentValue) {
-                              return showDatePicker(
-                                context: context,
-                                firstDate: DateTime(
-                                  int.parse(firstDate.split("-")[0]),
-                                  int.parse(firstDate.split("-")[1]),
-                                  int.parse(firstDate.split("-")[2]),
-                                ),
-                                initialDate: currentValue ?? DateTime.now(),
-                                lastDate: DateTime.now(),
-                              );
-                            },
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: AppColors.form,
-                              hintText: "Start Date",
-                              enabledBorder: formBorder,
-                              focusedBorder: formBorder,
-                              errorBorder: formBorder,
-                              focusedErrorBorder: formBorder,
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: sWidth * .45,
-                          height: 60,
-                          child: DateTimeField(
-                            onChanged: (value) {
-                              endDate = value.toString().split(" ")[0];
-                            },
-                            format: DateFormat("yyyy-MM-dd"),
-                            onShowPicker: (context, currentValue) {
-                              return showDatePicker(
-                                context: context,
-                                firstDate: DateTime(
-                                  int.parse(firstDate.split("-")[0]),
-                                  int.parse(firstDate.split("-")[1]),
-                                  int.parse(firstDate.split("-")[2]),
-                                ),
-                                initialDate: currentValue ?? DateTime.now(),
-                                lastDate: DateTime.now(),
-                              );
-                            },
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: AppColors.form,
-                              hintText: "End Date",
-                              enabledBorder: formBorder,
-                              focusedBorder: formBorder,
-                              errorBorder: formBorder,
-                              focusedErrorBorder: formBorder,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    ElevatedButton(
-                      onPressed: () async {
-                        if (startDate == "" ||
-                            startDate == "null" ||
-                            endDate == "" ||
-                            endDate == "null") {
-                          Fluttertoast.showToast(
-                            msg: "Both start and end date is required.",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.BOTTOM,
-                            timeInSecForIosWeb: 3,
-                            backgroundColor: Colors.red,
-                            textColor: Colors.white,
-                            fontSize: 16.0,
-                          );
-                        } else {
-                          List<ExpenseData> tempExpenseList =
-                              await ExpenseHttp().getCategorizedSpecificExpense(
-                                  widget.category!, startDate, endDate);
-
-                          int tempExpenseAmount = 0;
-                          for (int i = 0; i < tempExpenseList.length; i++) {
-                            tempExpenseAmount =
-                                tempExpenseAmount + tempExpenseList[i].amount!;
-                          }
-
-                          setState(() {
-                            expenseList = tempExpenseList;
-                            expenseAmount = tempExpenseAmount;
-                          });
-                        }
-                      },
-                      child: Text(
-                        "Search",
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        primary: AppColors.primary,
-                        minimumSize: Size.zero,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 8,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              )
-            : SizedBox()
       ],
     );
   }
@@ -411,7 +423,7 @@ class _CategorizedExpenseState extends State<CategorizedExpense> {
             height: 200,
             child: Center(
               child: Text(
-                "No expense yet",
+                "No expenses",
                 style: TextStyle(
                   color: AppColors.text,
                   fontWeight: FontWeight.bold,

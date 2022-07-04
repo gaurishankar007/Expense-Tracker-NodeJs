@@ -53,7 +53,7 @@ router.get("/user/getHome", auth.verifyUser, async (req, res) => {
     }
   }
 
-  if (expenseDays.length <= 1) {
+  if (expenseDays.length <= 2) {
     thisMonthView = false;
     expenseDays.splice(0, expenseDays.length);
     expenseAmounts.splice(0, expenseAmounts.length);
@@ -86,37 +86,29 @@ router.get("/user/getHome", auth.verifyUser, async (req, res) => {
   }
 
   var thisMonthExpenseAmount = 0;
-  const maxExpenseCategory = { _id: "", amount: 0 };
   const thisMonthExpenseCategories = await expense.aggregate([
     { $match: { user: req.userInfo._id, createdAt: { $gte: thisMonth } } },
     {
       $group: { _id: "$category", amount: { $sum: "$amount" } },
     },
+    { $sort: { amount: -1 } },
   ]);
   for (let i = 0; i < thisMonthExpenseCategories.length; i++) {
     thisMonthExpenseAmount =
       thisMonthExpenseAmount + thisMonthExpenseCategories[i].amount;
-    if (thisMonthExpenseCategories[i].amount > maxExpenseCategory.amount) {
-      maxExpenseCategory._id = thisMonthExpenseCategories[i]._id;
-      maxExpenseCategory.amount = thisMonthExpenseCategories[i].amount;
-    }
   }
 
   var thisMonthIncomeAmount = 0;
-  const maxIncomeCategory = { _id: "", amount: 0 };
   const thisMonthIncomeCategories = await income.aggregate([
     { $match: { user: req.userInfo._id, createdAt: { $gte: thisMonth } } },
     {
       $group: { _id: "$category", amount: { $sum: "$amount" } },
     },
+    { $sort: { amount: -1 } },
   ]);
   for (let i = 0; i < thisMonthIncomeCategories.length; i++) {
     thisMonthIncomeAmount =
       thisMonthIncomeAmount + thisMonthIncomeCategories[i].amount;
-    if (thisMonthIncomeCategories[i].amount > maxIncomeCategory.amount) {
-      maxIncomeCategory._id = thisMonthIncomeCategories[i]._id;
-      maxIncomeCategory.amount = thisMonthIncomeCategories[i].amount;
-    }
   }
 
   const previousMonthExpenseCategory = await expense.aggregate([
@@ -188,8 +180,6 @@ router.get("/user/getHome", auth.verifyUser, async (req, res) => {
     thisMonthIncomeAmount: thisMonthIncomeAmount,
     previousMonthExpenseAmount: previousMonthExpenseAmount,
     previousMonthIncomeAmount: previousMonthIncomeAmount,
-    maxExpenseCategory: maxExpenseCategory,
-    maxIncomeCategory: maxIncomeCategory,
     thisMonthExpenseCategories: thisMonthExpenseCategories,
     thisMonthIncomeCategories: thisMonthIncomeCategories,
     thisMonthExpenseRate: thisMonthExpenseRate,

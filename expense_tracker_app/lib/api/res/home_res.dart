@@ -14,8 +14,6 @@ class HomeData {
   List<IncomeCategorized>? thisMonthIncomeCategories;
   int? thisMonthExpenseAmount;
   int? thisMonthIncomeAmount;
-  ExpenseCategorized? maxExpenseCategory;
-  ExpenseCategorized? maxIncomeCategory;
   int? previousMonthExpenseAmount;
   int? previousMonthIncomeAmount;
   double? thisMonthExpenseRate;
@@ -32,8 +30,6 @@ class HomeData {
     this.thisMonthIncomeCategories,
     this.thisMonthExpenseAmount,
     this.thisMonthIncomeAmount,
-    this.maxExpenseCategory,
-    this.maxIncomeCategory,
     this.previousMonthExpenseAmount,
     this.previousMonthIncomeAmount,
     this.thisMonthExpenseRate,

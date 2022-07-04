@@ -112,7 +112,7 @@ class _VerifyTokenState extends State<VerifyToken> {
                           gravity: ToastGravity.BOTTOM,
                           timeInSecForIosWeb: 5,
                           backgroundColor: Colors.green,
-                          textColor: Colors.white,
+                          textColor: AppColors.primary,
                         );
                       } else {
                         Fluttertoast.showToast(
@@ -121,7 +121,7 @@ class _VerifyTokenState extends State<VerifyToken> {
                           gravity: ToastGravity.TOP,
                           timeInSecForIosWeb: 3,
                           backgroundColor: Colors.red,
-                          textColor: Colors.white,
+                          textColor: AppColors.primary,
                           fontSize: 16.0,
                         );
                       }
@@ -138,7 +138,7 @@ class _VerifyTokenState extends State<VerifyToken> {
                     elevation: 10,
                     shadowColor: Colors.black,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(5),
                     ),
                   ),
                 ),

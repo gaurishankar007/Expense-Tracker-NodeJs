@@ -50,7 +50,7 @@ class _LoginState extends State<Login> {
             child: Column(
               children: [
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(5),
                   child: Image(
                     height: 160,
                     width: 175,
@@ -161,7 +161,7 @@ class _LoginState extends State<Login> {
                           gravity: ToastGravity.TOP,
                           timeInSecForIosWeb: 3,
                           backgroundColor: Colors.red,
-                          textColor: Colors.white,
+                          textColor: AppColors.primary,
                           fontSize: 16.0,
                         );
                       }
@@ -178,7 +178,7 @@ class _LoginState extends State<Login> {
                     elevation: 10,
                     shadowColor: Colors.black,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(5),
                     ),
                   ),
                 ),
@@ -225,7 +225,7 @@ class _LoginState extends State<Login> {
                     elevation: 10,
                     shadowColor: Colors.black,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(5),
                     ),
                   ),
                 ),

@@ -1,6 +1,5 @@
 class Category {
   static final List<String> expenseCategory = [
-    "Other",
     "Clothing",
     "Debt",
     "Education",
@@ -15,15 +14,16 @@ class Category {
     "Retirement",
     "Transportation",
     "Utilities",
+    "Other",
   ];
 
   static final List<String> incomeCategory = [
-    "Other",
     "Business",
     "Investment",
     "Online Platform",
     "Salary",
     "Sale",
     "Wage",
+    "Other",
   ];
 }

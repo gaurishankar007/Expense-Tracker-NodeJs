@@ -212,7 +212,9 @@ router.post("/income/getSpecific", auth.verifyUser, async (req, res) => {
   );
 
   const endDate = new Date(
-    new Date(eDate).getTime() + currentDateTime.getTimezoneOffset() * 60 * 1000
+    new Date(eDate).getTime() +
+      24 * 60 * 60 * 1000 +
+      currentDateTime.getTimezoneOffset() * 60 * 1000
   );
 
   const incomes = await income
@@ -350,6 +352,7 @@ router.post(
 
     const endDate = new Date(
       new Date(eDate).getTime() +
+        24 * 60 * 60 * 1000 +
         currentDateTime.getTimezoneOffset() * 60 * 1000
     );
 

@@ -54,6 +54,7 @@ class _UserSettingState extends State<UserSetting> {
   @override
   Widget build(BuildContext context) {
     final sWidth = MediaQuery.of(context).size.width;
+    final sHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       appBar: AppBar(
@@ -84,9 +85,22 @@ class _UserSettingState extends State<UserSetting> {
           child: FutureBuilder<User>(
             future: getUser,
             builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return Column(
-                  children: [
+              List<Widget> children = [];
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                children = <Widget>[
+                  Container(
+                    width: sWidth * 0.97,
+                    height: sHeight,
+                    alignment: Alignment.center,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 3,
+                      color: AppColors.primary,
+                    ),
+                  )
+                ];
+              } else if (snapshot.connectionState == ConnectionState.done) {
+                if (snapshot.hasData) {
+                  children = <Widget>[
                     ListTile(
                       contentPadding:
                           EdgeInsets.only(left: 0, right: 0, bottom: 20),
@@ -474,23 +488,53 @@ class _UserSettingState extends State<UserSetting> {
                               ),
                             ),
                     ),
-                  ],
-                );
-              } else if (snapshot.hasError) {
-                return Center(
-                  child: Text(
-                    "${snapshot.error}",
-                    style: TextStyle(
-                      fontSize: 15,
-                    ),
-                  ),
-                );
+                  ];
+                } else if (snapshot.hasError) {
+                  if ("${snapshot.error}".split("Exception: ")[0] == "Socket") {
+                    children = <Widget>[
+                      Container(
+                        width: sWidth,
+                        height: sHeight,
+                        alignment: Alignment.center,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(
+                              Icons.warning_rounded,
+                              size: 25,
+                              color: Colors.red,
+                            ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Text(
+                              "Connection Problem",
+                              style: TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      )
+                    ];
+                  } else {
+                    children = <Widget>[
+                      Container(
+                        width: sWidth,
+                        height: sHeight,
+                        alignment: Alignment.center,
+                        child: Text(
+                          "${snapshot.error}",
+                          style: TextStyle(
+                            fontSize: 15,
+                          ),
+                        ),
+                      )
+                    ];
+                  }
+                }
               }
-              return Center(
-                child: CircularProgressIndicator(
-                  strokeWidth: 5,
-                  color: AppColors.primary,
-                ),
+              return Column(
+                children: children,
               );
             },
           ),

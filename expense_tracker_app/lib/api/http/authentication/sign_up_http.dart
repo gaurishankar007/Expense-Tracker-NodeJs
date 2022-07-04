@@ -10,18 +10,22 @@ class SignUpHttp {
   final token = LogStatus.token;
 
   Future<Map> signUp(UploadUser userDetails) async {
-    Map<String, String> userData = {
-      "email": userDetails.email!,
-      "password": userDetails.password!,
-      "confirmPassword": userDetails.confirmPassword!,
-      "profileName": userDetails.profileName!,
-    };
+    try {
+      Map<String, String> userData = {
+        "email": userDetails.email!,
+        "password": userDetails.password!,
+        "confirmPassword": userDetails.confirmPassword!,
+        "profileName": userDetails.profileName!,
+      };
 
-    final response =
-        await post(Uri.parse(routeUrl + "user/register"), body: userData);
-    return {
-      "statusCode": response.statusCode,
-      "body": jsonDecode(response.body) as Map,
-    };
+      final response =
+          await post(Uri.parse(routeUrl + "user/register"), body: userData);
+      return {
+        "statusCode": response.statusCode,
+        "body": jsonDecode(response.body) as Map,
+      };
+    } catch (error) {
+      return Future.error(error);
+    }
   }
 }

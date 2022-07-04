@@ -186,7 +186,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                           gravity: ToastGravity.BOTTOM,
                           timeInSecForIosWeb: 3,
                           backgroundColor: Colors.red,
-                          textColor: Colors.white,
+                          textColor: AppColors.primary,
                           msg: "Password and confirm password must be same",
                         );
                         return;
@@ -210,7 +210,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                           gravity: ToastGravity.BOTTOM,
                           timeInSecForIosWeb: 3,
                           backgroundColor: Colors.green,
-                          textColor: Colors.white,
+                          textColor: AppColors.primary,
                         );
                       } else {
                         Fluttertoast.showToast(
@@ -219,7 +219,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                           gravity: ToastGravity.TOP,
                           timeInSecForIosWeb: 3,
                           backgroundColor: Colors.red,
-                          textColor: Colors.white,
+                          textColor: AppColors.primary,
                           fontSize: 16.0,
                         );
                       }
@@ -236,7 +236,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                     elevation: 10,
                     shadowColor: Colors.black,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(5),
                     ),
                   ),
                 ),

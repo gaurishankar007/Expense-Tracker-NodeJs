@@ -225,7 +225,7 @@ class _SignUpState extends State<SignUp> {
                           gravity: ToastGravity.BOTTOM,
                           timeInSecForIosWeb: 3,
                           backgroundColor: Colors.green,
-                          textColor: Colors.white,
+                          textColor: AppColors.primary,
                           msg: resData["body"]["resM"],
                         );
                       } else {
@@ -234,7 +234,7 @@ class _SignUpState extends State<SignUp> {
                           gravity: ToastGravity.BOTTOM,
                           timeInSecForIosWeb: 3,
                           backgroundColor: Colors.red,
-                          textColor: Colors.white,
+                          textColor: AppColors.primary,
                           msg: resData["body"]["resM"],
                         );
                       }
@@ -244,7 +244,7 @@ class _SignUpState extends State<SignUp> {
                         gravity: ToastGravity.BOTTOM,
                         timeInSecForIosWeb: 3,
                         backgroundColor: Colors.red,
-                        textColor: Colors.white,
+                        textColor: AppColors.primary,
                         msg: "Please fill the required form",
                       );
                     }
@@ -260,7 +260,7 @@ class _SignUpState extends State<SignUp> {
                     elevation: 10,
                     shadowColor: Colors.black,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(5),
                     ),
                   ),
                 ),
