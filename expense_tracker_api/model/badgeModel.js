@@ -7,6 +7,10 @@ const badgeSchema = new mongoose.Schema(
       trim: true,
     },
 
+    requiredProgressPoint: {
+      type: Number,
+    },
+
     description: {
       type: String,
       trim: true,

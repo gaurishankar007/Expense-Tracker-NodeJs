@@ -78,7 +78,7 @@ class _SignUpState extends State<SignUp> {
                   onSaved: (value) {
                     email = value!;
                   },
-                  textCapitalization: TextCapitalization.words,
+                  keyboardType: TextInputType.emailAddress,
                   validator: (value) {
                     MultiValidator([
                       RequiredValidator(errorText: "Email is required!"),
@@ -129,7 +129,6 @@ class _SignUpState extends State<SignUp> {
                       onSaved: (value) {
                         password = value!;
                       },
-                      textCapitalization: TextCapitalization.words,
                       validator: (value) {
                         MultiValidator([
                           RequiredValidator(errorText: "Password is required!"),

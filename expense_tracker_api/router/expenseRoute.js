@@ -2,6 +2,7 @@ const express = require("express");
 const router = new express.Router();
 const auth = require("../authentication/auth");
 const expense = require("../model/expenseModel");
+const progress = require("../model/progressModel");
 
 router.post("/expense/add", auth.verifyUser, (req, res) => {
   const name = req.body.name;
@@ -35,7 +36,16 @@ router.post("/expense/add", auth.verifyUser, (req, res) => {
   });
 
   newExpense.save().then(() => {
-    res.status(201).send({ resM: "Expense added." });
+    progress.findOne({ user: req.userInfo._id }).then((progressData) => {
+      progress
+        .updateOne(
+          { user: req.userInfo._id },
+          { progress: progressData.progress + 5 }
+        )
+        .then(() => {
+          res.status(201).send({ resM: "Expense added." });
+        });
+    });
   });
 });
 
@@ -256,7 +266,16 @@ router.post("/expense/getSpecific", auth.verifyUser, async (req, res) => {
 
 router.delete("/expense/remove", auth.verifyUser, (req, res) => {
   expense.findOneAndDelete({ _id: req.body.expenseId }).then(() => {
-    res.send({ resM: "Expense removed." });
+    progress.findOne({ user: req.userInfo._id }).then((progressData) => {
+      progress
+        .updateOne(
+          { user: req.userInfo._id },
+          { progress: progressData.progress - 5 }
+        )
+        .then(() => {
+          res.send({ resM: "Expense removed." });
+        });
+    });
   });
 });
 

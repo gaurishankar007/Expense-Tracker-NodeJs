@@ -7,17 +7,27 @@ const progressSchema = new mongoose.Schema(
       ref: "user",
     },
 
-    Progress: {
+    progress: {
       type: Number,
       default: 10,
     },
 
-    PMP: {
+    tmp: {
+      type: Number,
+      default: 0,
+    },
+
+    pmp: {
       type: Number,
       default: 0,
     },
 
     badge: {
+      type: mongoose.Schema.ObjectId,
+      ref: "badge",
+    },
+
+    pMBadge: {
       type: mongoose.Schema.ObjectId,
       ref: "badge",
     },

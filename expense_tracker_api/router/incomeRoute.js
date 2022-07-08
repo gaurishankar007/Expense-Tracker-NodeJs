@@ -2,6 +2,7 @@ const express = require("express");
 const router = new express.Router();
 const auth = require("../authentication/auth");
 const income = require("../model/incomeModel");
+const progress = require("../model/progressModel");
 
 router.post("/income/add", auth.verifyUser, (req, res) => {
   const name = req.body.name;
@@ -35,7 +36,16 @@ router.post("/income/add", auth.verifyUser, (req, res) => {
   });
 
   newIncome.save().then(() => {
-    res.status(201).send({ resM: "Income added." });
+    progress.findOne({ user: req.userInfo._id }).then((progressData) => {
+      progress
+        .updateOne(
+          { user: req.userInfo._id },
+          { progress: progressData.progress + 10 }
+        )
+        .then(() => {
+          res.status(201).send({ resM: "Income added." });
+        });
+    });
   });
 });
 
@@ -256,7 +266,16 @@ router.post("/income/getSpecific", auth.verifyUser, async (req, res) => {
 
 router.delete("/income/remove", auth.verifyUser, (req, res) => {
   income.findOneAndDelete({ _id: req.body.incomeId }).then(() => {
-    res.send({ resM: "Income removed." });
+    progress.findOne({ user: req.userInfo._id }).then((progressData) => {
+      progress
+        .updateOne(
+          { user: req.userInfo._id },
+          { progress: progressData.progress - 10 }
+        )
+        .then(() => {
+          res.send({ resM: "Income removed." });
+        });
+    });
   });
 });
 

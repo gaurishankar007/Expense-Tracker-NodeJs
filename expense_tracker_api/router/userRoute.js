@@ -66,6 +66,7 @@ router.post("/user/register", (req, res) => {
       const newProgress = new progress({
         user: newUser._id,
         badge: mongoose.Types.ObjectId("62c017a6e641bef273362a76"),
+        pMBadge: mongoose.Types.ObjectId("62c017a6e641bef273362a76"),
       });
 
       newProgress.save().then(() => {

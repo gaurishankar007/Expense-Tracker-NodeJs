@@ -30,6 +30,9 @@ app.use(badge);
 const achievement = require("./router/achievementRoute");
 app.use(achievement);
 
+const progress = require("./router/progressRoute");
+app.use(progress);
+
 app.listen(8848, () => {
   console.log("Server running on port: 8848...");
 });

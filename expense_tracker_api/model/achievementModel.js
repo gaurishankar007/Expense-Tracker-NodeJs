@@ -7,6 +7,10 @@ const achievementSchema = new mongoose.Schema(
       trim: true,
     },
 
+    progressPoint: {
+      type: Number,
+    },
+
     description: {
       type: String,
       trim: true,

@@ -9,7 +9,7 @@ router.post("/achievement/create", auth.verifyUser, async (req, res) => {
   const description = req.body.description;
 
   if (name.trim() === "" || name === undefined || description.trim() === ""  || description === undefined) {
-    return res.status(400).send({ resM: "Provide name, description, and permanent." });
+    return res.status(400).send({ resM: "Provide both name and description" });
   }
 
   const newAchievement = new achievement({

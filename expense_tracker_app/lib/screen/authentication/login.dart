@@ -75,6 +75,7 @@ class _LoginState extends State<Login> {
                       onSaved: (value) {
                         email = value!;
                       },
+                      keyboardType: TextInputType.emailAddress,
                       validator: MultiValidator([
                         RequiredValidator(errorText: "Email is required!"),
                       ]),
@@ -142,8 +143,7 @@ class _LoginState extends State<Login> {
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       _formKey.currentState!.save();
-                      final resData =
-                          await LoginHttp().login(email, password);
+                      final resData = await LoginHttp().login(email, password);
                       if (resData["statusCode"] == 202) {
                         LogStatus().setToken(resData["body"]["token"]);
                         LogStatus.token = resData["body"]["token"];
