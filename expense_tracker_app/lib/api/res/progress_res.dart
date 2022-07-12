@@ -4,26 +4,6 @@ import 'package:json_annotation/json_annotation.dart';
 part 'progress_res.g.dart';
 
 @JsonSerializable()
-class Badge {
-  @JsonKey(name: "_id")
-  String? id;
-
-  String? name;
-  int? requiredProgressPoint;
-  String? description;
-
-  Badge({
-    this.name,
-    this.requiredProgressPoint,
-    this.description,
-  });
-
-  factory Badge.fromJson(Map<String, dynamic> json) => _$BadgeFromJson(json);
-
-  Map<String, dynamic> toJson() => _$BadgeToJson(this);
-}
-
-@JsonSerializable()
 class Achievement {
   @JsonKey(name: "_id")
   String? id;
@@ -53,8 +33,6 @@ class Progress {
   int? progress;
   int? tmp;
   int? pmp;
-  Badge? badge;
-  Badge? pMBadge;
   List<Achievement>? oldAchievement;
   List<Achievement>? newAchievement;
 
@@ -63,8 +41,6 @@ class Progress {
     this.progress,
     this.tmp,
     this.pmp,
-    this.badge,
-    this.pMBadge,
     this.oldAchievement,
     this.newAchievement,
   });

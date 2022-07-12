@@ -7,8 +7,8 @@ router.get("/user/getProgress", auth.verifyUser, async (req, res) => {
   const userProgress = await progress
     .findOne({ user: req.userInfo._id })
     .populate("user")
-    .populate("badge")
-    .populate("pMBadge");
+    .populate("oldAchievement")
+    .populate("newAchievement");
 
   res.send({ progress: userProgress });
 });

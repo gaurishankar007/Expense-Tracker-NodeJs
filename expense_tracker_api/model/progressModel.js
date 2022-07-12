@@ -22,16 +22,6 @@ const progressSchema = new mongoose.Schema(
       default: 0,
     },
 
-    badge: {
-      type: mongoose.Schema.ObjectId,
-      ref: "badge",
-    },
-
-    pMBadge: {
-      type: mongoose.Schema.ObjectId,
-      ref: "badge",
-    },
-
     oldAchievement: [
       {
         type: mongoose.Schema.ObjectId,
@@ -45,6 +35,11 @@ const progressSchema = new mongoose.Schema(
         ref: "achievement",
       },
     ],
+
+    pmc: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

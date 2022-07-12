@@ -40,7 +40,10 @@ router.post("/income/add", auth.verifyUser, (req, res) => {
       progress
         .updateOne(
           { user: req.userInfo._id },
-          { progress: progressData.progress + 10 }
+          {
+            progress: progressData.progress + 15,
+            tmp: progressData.tmp + 15,
+          }
         )
         .then(() => {
           res.status(201).send({ resM: "Income added." });
@@ -270,7 +273,10 @@ router.delete("/income/remove", auth.verifyUser, (req, res) => {
       progress
         .updateOne(
           { user: req.userInfo._id },
-          { progress: progressData.progress - 10 }
+          {
+            progress: progressData.progress - 15,
+            tmp: progressData.tmp - 15,
+          }
         )
         .then(() => {
           res.send({ resM: "Income removed." });

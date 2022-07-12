@@ -7,14 +7,20 @@ const user = require("../model/userModel");
 router.post("/achievement/create", auth.verifyUser, async (req, res) => {
   const name = req.body.name;
   const description = req.body.description;
+  const progressPoint = req.body.progressPoint;
+  
+  const progressPointRegex = new RegExp("^[0-9]+$");
 
-  if (name.trim() === "" || name === undefined || description.trim() === ""  || description === undefined) {
+  if (name.trim() === "" || name === undefined || description.trim() === ""  || description === undefined || progressPoint === undefined) {
     return res.status(400).send({ resM: "Provide both name and description" });
+  } else if (!progressPointRegex.test(progressPoint)) {
+    return res.status(400).send({ resM: "Invalid progressPoint." });
   }
 
   const newAchievement = new achievement({
     name: name,
-    description: description
+    description: description,
+    progressPoint: progressPoint
   });
 
   newAchievement.save().then(() => {

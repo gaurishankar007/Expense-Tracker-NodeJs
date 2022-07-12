@@ -1,5 +1,6 @@
 import 'package:expense_tracker/api/http/progress_http.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../api/res/progress_res.dart';
 import '../api/urls.dart';
@@ -83,18 +84,19 @@ class _ResultState extends State<Result> {
                         ),
                       ],
                     ),
-                    RichText(
-                      text: TextSpan(
-                        text: "Progress: ",
-                        style: TextStyle(
-                          color: AppColors.text,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: snapshot.data!.progress!.progress!.toString(),
-                          ),
-                        ],
-                      ),
+                    progressPoints(
+                      context,
+                      snapshot.data!.progress!.progress!,
+                      snapshot.data!.progress!.pmp!,
+                      snapshot.data!.progress!.tmp!,
+                    ),
+                    thisMonthAchievements(
+                      context,
+                      snapshot.data!.progress!.newAchievement!,
+                    ),
+                    previousMonthAchievements(
+                      context,
+                      snapshot.data!.progress!.oldAchievement!,
                     ),
                   ];
                 } else if (snapshot.hasError) {
@@ -150,6 +152,411 @@ class _ResultState extends State<Result> {
         ),
       ),
       bottomNavigationBar: PageNavigator(pageIndex: 3),
+    );
+  }
+
+  Widget progressPoints(
+      BuildContext context, int progress1, int pmp1, int tmp1) {
+    final sHeight = MediaQuery.of(context).size.height;
+
+    String progress = progress1 > 1000
+        ? (progress1 / 1000).toStringAsFixed(1) + " K"
+        : progress1.toString();
+
+    String pmp =
+        pmp1 > 1000 ? (pmp1 / 1000).toStringAsFixed(1) + " K" : pmp1.toString();
+
+    String tmp =
+        tmp1 > 1000 ? (tmp1 / 1000).toStringAsFixed(1) + " K" : tmp1.toString();
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          children: [
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                Container(
+                  width: sHeight * .13,
+                  height: sHeight * .13,
+                  decoration: BoxDecoration(
+                    color: Colors.orange,
+                    borderRadius: BorderRadius.circular(sHeight * .065),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black26,
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                      )
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.all(10),
+                  alignment: Alignment.center,
+                  width: sHeight * .11,
+                  height: sHeight * .11,
+                  decoration: BoxDecoration(
+                    color: AppColors.onPrimary,
+                    borderRadius: BorderRadius.circular(sHeight * .055),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black26,
+                        spreadRadius: 1,
+                        blurRadius: 10,
+                      )
+                    ],
+                  ),
+                  child: RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                      text: pmp,
+                      style: TextStyle(
+                        color: AppColors.text,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 5,
+            ),
+            RichText(
+              text: TextSpan(
+                text: "PM",
+                style: TextStyle(
+                  color: AppColors.text,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        Column(
+          children: [
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                Container(
+                  width: sHeight * .19,
+                  height: sHeight * .19,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(sHeight * .095),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black26,
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                      )
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.all(10),
+                  alignment: Alignment.center,
+                  width: sHeight * .16,
+                  height: sHeight * .16,
+                  decoration: BoxDecoration(
+                    color: AppColors.onPrimary,
+                    borderRadius: BorderRadius.circular(sHeight * .08),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black26,
+                        spreadRadius: 1,
+                        blurRadius: 10,
+                      )
+                    ],
+                  ),
+                  child: RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                      text: progress,
+                      style: TextStyle(
+                        color: AppColors.text,
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 5,
+            ),
+            RichText(
+              text: TextSpan(
+                text: "Total",
+                style: TextStyle(
+                  color: AppColors.text,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        Column(
+          children: [
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                Container(
+                  width: sHeight * .13,
+                  height: sHeight * .13,
+                  decoration: BoxDecoration(
+                    color: Colors.green,
+                    borderRadius: BorderRadius.circular(sHeight * .065),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black26,
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                      )
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.all(10),
+                  alignment: Alignment.center,
+                  width: sHeight * .11,
+                  height: sHeight * .11,
+                  decoration: BoxDecoration(
+                    color: AppColors.onPrimary,
+                    borderRadius: BorderRadius.circular(sHeight * .055),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black26,
+                        spreadRadius: 1,
+                        blurRadius: 10,
+                      )
+                    ],
+                  ),
+                  child: RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                      text: tmp,
+                      style: TextStyle(
+                        color: AppColors.text,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 5,
+            ),
+            RichText(
+              text: TextSpan(
+                text: "TM",
+                style: TextStyle(
+                  color: AppColors.text,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget thisMonthAchievements(
+      BuildContext context, List<Achievement> newAchievements) {
+    final sHeight = MediaQuery.of(context).size.height;
+    final sWidth = MediaQuery.of(context).size.width;
+
+    if (newAchievements.isEmpty) {
+      return SizedBox();
+    }
+
+    return Padding(
+      padding: EdgeInsets.only(top: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                "New",
+                style: TextStyle(
+                  fontSize: 18,
+                  color: AppColors.text,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(
+                width: 5,
+              ),
+              Icon(
+                FontAwesomeIcons.medal,
+                color: AppColors.primary,
+                size: 20,
+              ),
+            ],
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          GridView.count(
+            physics: NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            childAspectRatio: (sWidth - (sWidth * .53)) / (sHeight * .15),
+            crossAxisSpacing: 5,
+            crossAxisCount: 2,
+            children: List.generate(
+              newAchievements.length,
+              (index) {
+                return Column(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black26,
+                            spreadRadius: 1,
+                            blurRadius: 5,
+                            offset: Offset(2, 2),
+                          )
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image(
+                          height: sHeight * 0.1,
+                          width: sWidth * 0.2,
+                          fit: BoxFit.cover,
+                          image: AssetImage(
+                            "image/category/Clothing.jpg",
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      newAchievements[index].name!,
+                      textAlign: TextAlign.center,
+                      softWrap: true,
+                      style: TextStyle(
+                        color: AppColors.text,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget previousMonthAchievements(
+      BuildContext context, List<Achievement> oldAchievements) {
+    final sHeight = MediaQuery.of(context).size.height;
+    final sWidth = MediaQuery.of(context).size.width;
+
+    if (oldAchievements.isEmpty) {
+      return SizedBox();
+    }
+
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                "Old",
+                style: TextStyle(
+                  fontSize: 18,
+                  color: AppColors.text,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(
+                width: 5,
+              ),
+              Icon(
+                FontAwesomeIcons.medal,
+                color: AppColors.primary,
+                size: 20,
+              ),
+            ],
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          GridView.count(
+            physics: NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            childAspectRatio: (sWidth - (sWidth * .53)) / (sHeight * .15),
+            crossAxisSpacing: 5,
+            crossAxisCount: 2,
+            children: List.generate(
+              oldAchievements.length,
+              (index) {
+                return Column(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black26,
+                            spreadRadius: 1,
+                            blurRadius: 5,
+                            offset: Offset(2, 2),
+                          )
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image(
+                          height: sHeight * 0.1,
+                          width: sWidth * 0.2,
+                          fit: BoxFit.cover,
+                          image: AssetImage(
+                            "image/category/Clothing.jpg",
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      oldAchievements[index].name!,
+                      textAlign: TextAlign.center,
+                      softWrap: true,
+                      style: TextStyle(
+                        color: AppColors.text,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

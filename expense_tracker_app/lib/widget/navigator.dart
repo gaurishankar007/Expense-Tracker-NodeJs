@@ -2,6 +2,7 @@ import 'package:expense_tracker/screen/expense.dart';
 import 'package:expense_tracker/screen/income.dart';
 import 'package:expense_tracker/screen/result.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../screen/home.dart';
 
 class PageNavigator extends StatelessWidget {
@@ -47,11 +48,11 @@ class PageNavigator extends StatelessWidget {
         ),
         NavigationDestination(
           icon: Icon(
-            Icons.bar_chart_rounded,
+            FontAwesomeIcons.chartLine,
             color: Colors.black,
           ),
           selectedIcon: Icon(
-            Icons.bar_chart_rounded,
+            FontAwesomeIcons.chartLine,
             color: Color(0XFF5B86E5),
           ),
           label: "Progress",

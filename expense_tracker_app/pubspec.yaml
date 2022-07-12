@@ -45,6 +45,7 @@ dependencies:
   form_field_validator: ^1.1.0
   fl_chart: ^0.55.0
   datetime_picker_formfield: ^2.0.0
+  font_awesome_flutter: ^10.1.0
 
 flutter_icons:
   android: true

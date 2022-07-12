@@ -24,9 +24,6 @@ app.use(income);
 const home = require("./router/homeRoute");
 app.use(home);
 
-const badge = require("./router/badgeRoute");
-app.use(badge);
-
 const achievement = require("./router/achievementRoute");
 app.use(achievement);
 
