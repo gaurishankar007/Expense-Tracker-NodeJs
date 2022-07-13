@@ -34,7 +34,10 @@ class _PasswordSettingState extends State<PasswordSetting> {
       appBar: AppBar(
         title: Text(
           "Change Password",
-          style: TextStyle(color: AppColors.text),
+          style: TextStyle(
+            color: AppColors.onPrimary,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
         leading: IconButton(
@@ -43,11 +46,11 @@ class _PasswordSettingState extends State<PasswordSetting> {
           },
           icon: Icon(
             Icons.arrow_back,
-            color: Colors.black,
+            color: AppColors.onPrimary,
           ),
         ),
         elevation: 0,
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.primary,
       ),
       body: SafeArea(
         child: SingleChildScrollView(

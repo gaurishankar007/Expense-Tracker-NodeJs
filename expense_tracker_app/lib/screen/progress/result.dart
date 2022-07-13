@@ -1,11 +1,13 @@
 import 'package:expense_tracker/api/http/progress_http.dart';
+import 'package:expense_tracker/screen/progress/achievements.dart';
+import 'package:expense_tracker/screen/progress/rank.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import '../api/res/progress_res.dart';
-import '../api/urls.dart';
-import '../resource/colors.dart';
-import '../widget/navigator.dart';
+import '../../api/res/progress_res.dart';
+import '../../api/urls.dart';
+import '../../resource/colors.dart';
+import '../../widget/navigator.dart';
 
 class Result extends StatefulWidget {
   const Result({Key? key}) : super(key: key);
@@ -63,23 +65,46 @@ class _ResultState extends State<Result> {
                 if (snapshot.hasData) {
                   children = <Widget>[
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        CircleAvatar(
-                          radius: 20,
-                          backgroundImage: NetworkImage(
-                            routeUrl +
-                                snapshot.data!.progress!.user!.profilePicture!,
-                          ),
+                        Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 20,
+                              backgroundImage: NetworkImage(
+                                routeUrl +
+                                    snapshot
+                                        .data!.progress!.user!.profilePicture!,
+                              ),
+                            ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Text(
+                              "Your Progress",
+                              style: TextStyle(
+                                color: AppColors.text,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ],
                         ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        Text(
-                          "Your Progress",
-                          style: TextStyle(
-                            color: AppColors.text,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
+                        IconButton(
+                          constraints: BoxConstraints(),
+                          padding: EdgeInsets.zero,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (builder) => RankingSystem(),
+                              ),
+                            );
+                          },
+                          icon: Icon(
+                            FontAwesomeIcons.rankingStar,
+                            color: AppColors.primary,
+                            size: 20,
                           ),
                         ),
                       ],
@@ -385,22 +410,32 @@ class _ResultState extends State<Result> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "New",
+                "New Achievements",
                 style: TextStyle(
                   fontSize: 18,
                   color: AppColors.text,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(
-                width: 5,
-              ),
-              Icon(
-                FontAwesomeIcons.medal,
-                color: AppColors.primary,
-                size: 20,
+              IconButton(
+                constraints: BoxConstraints(),
+                padding: EdgeInsets.zero,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (builder) => AllAchievements(),
+                    ),
+                  );
+                },
+                icon: Icon(
+                  FontAwesomeIcons.medal,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
               ),
             ],
           ),
@@ -480,22 +515,32 @@ class _ResultState extends State<Result> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "Old",
+                "Old Achievements",
                 style: TextStyle(
                   fontSize: 18,
                   color: AppColors.text,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(
-                width: 5,
-              ),
-              Icon(
-                FontAwesomeIcons.medal,
-                color: AppColors.primary,
-                size: 20,
+              IconButton(
+                constraints: BoxConstraints(),
+                padding: EdgeInsets.zero,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (builder) => AllAchievements(),
+                    ),
+                  );
+                },
+                icon: Icon(
+                  FontAwesomeIcons.medal,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
               ),
             ],
           ),

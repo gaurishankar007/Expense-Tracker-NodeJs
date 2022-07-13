@@ -6,11 +6,11 @@ import 'package:expense_tracker/resource/category.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-import '../api/http/income_http.dart';
-import '../api/model/expense_income_model.dart';
-import '../api/res/income_res.dart';
-import '../resource/colors.dart';
-import '../widget/navigator.dart';
+import '../../api/http/income_http.dart';
+import '../../api/model/expense_income_model.dart';
+import '../../api/res/income_res.dart';
+import '../../resource/colors.dart';
+import '../../widget/navigator.dart';
 
 class Income extends StatefulWidget {
   const Income({Key? key}) : super(key: key);

@@ -9,8 +9,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
-import '../resource/colors.dart';
-import '../widget/navigator.dart';
+import '../../resource/colors.dart';
+import '../../widget/navigator.dart';
 
 class Expense extends StatefulWidget {
   const Expense({Key? key}) : super(key: key);

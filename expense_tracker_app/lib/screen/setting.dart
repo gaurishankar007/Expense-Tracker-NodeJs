@@ -71,19 +71,19 @@ class _SettingState extends State<Setting> {
           },
           icon: Icon(
             Icons.arrow_back,
-            color: Colors.black,
+            color: AppColors.onPrimary,
           ),
         ),
         title: Text(
           "Settings",
           style: TextStyle(
-            color: AppColors.text,
+            color: AppColors.onPrimary,
             fontWeight: FontWeight.bold,
           ),
         ),
         elevation: 0,
         centerTitle: true,
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.primary,
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.only(

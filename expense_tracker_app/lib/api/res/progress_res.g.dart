@@ -57,3 +57,22 @@ Map<String, dynamic> _$ProgressDataToJson(ProgressData instance) =>
     <String, dynamic>{
       'progress': instance.progress?.toJson(),
     };
+
+TopProgress _$TopProgressFromJson(Map<String, dynamic> json) => TopProgress(
+      progress: (json['progress'] as List<dynamic>?)
+          ?.map((e) => Progress.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      tmp: (json['tmp'] as List<dynamic>?)
+          ?.map((e) => Progress.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      pmp: (json['pmp'] as List<dynamic>?)
+          ?.map((e) => Progress.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
+Map<String, dynamic> _$TopProgressToJson(TopProgress instance) =>
+    <String, dynamic>{
+      'progress': instance.progress?.map((e) => e.toJson()).toList(),
+      'tmp': instance.tmp?.map((e) => e.toJson()).toList(),
+      'pmp': instance.pmp?.map((e) => e.toJson()).toList(),
+    };

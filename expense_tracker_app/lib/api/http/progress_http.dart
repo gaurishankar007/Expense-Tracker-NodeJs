@@ -27,4 +27,21 @@ class ProgressHttp {
       return Future.error(error);
     }
   }
+
+  Future<TopProgress> topUsersProgress() async {
+    try {
+      final response = await get(
+        Uri.parse(routeUrl + "users/progresses"),
+        headers: {
+          HttpHeaders.authorizationHeader: "Bearer $token",
+        },
+      );
+
+      final resData = jsonDecode(response.body);
+
+      return TopProgress.fromJson(resData);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
 }

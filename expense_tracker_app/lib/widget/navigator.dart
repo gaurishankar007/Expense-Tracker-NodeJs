@@ -1,6 +1,6 @@
-import 'package:expense_tracker/screen/expense.dart';
-import 'package:expense_tracker/screen/income.dart';
-import 'package:expense_tracker/screen/result.dart';
+import 'package:expense_tracker/screen/expense/expense.dart';
+import 'package:expense_tracker/screen/income/income.dart';
+import 'package:expense_tracker/screen/progress/result.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../screen/home.dart';
@@ -26,22 +26,22 @@ class PageNavigator extends StatelessWidget {
         ),
         NavigationDestination(
           icon: Icon(
-            Icons.money_off_csred_rounded,
+            FontAwesomeIcons.circleDollarToSlot,
             color: Colors.black,
           ),
           selectedIcon: Icon(
-            Icons.money_off_csred_rounded,
+            FontAwesomeIcons.circleDollarToSlot,
             color: Color(0XFF5B86E5),
           ),
           label: "Expense",
         ),
         NavigationDestination(
           icon: Icon(
-            Icons.attach_money_rounded,
+            FontAwesomeIcons.sackDollar,
             color: Colors.black,
           ),
           selectedIcon: Icon(
-            Icons.attach_money_rounded,
+            FontAwesomeIcons.sackDollar,
             color: Color(0XFF5B86E5),
           ),
           label: "Income",

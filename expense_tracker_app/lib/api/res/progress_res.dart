@@ -64,3 +64,21 @@ class ProgressData {
 
   Map<String, dynamic> toJson() => _$ProgressDataToJson(this);
 }
+
+@JsonSerializable(explicitToJson: true)
+class TopProgress {
+  List<Progress>? progress;
+  List<Progress>? tmp;
+  List<Progress>? pmp;
+
+  TopProgress({
+    this.progress,
+    this.tmp,
+    this.pmp,
+  });
+
+  factory TopProgress.fromJson(Map<String, dynamic> json) =>
+      _$TopProgressFromJson(json);
+
+  Map<String, dynamic> toJson() => _$TopProgressToJson(this);
+}

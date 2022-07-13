@@ -60,7 +60,10 @@ class _UserSettingState extends State<UserSetting> {
       appBar: AppBar(
         title: Text(
           "Update Personal Info",
-          style: TextStyle(color: AppColors.text),
+          style: TextStyle(
+            color: AppColors.onPrimary,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
         leading: IconButton(
@@ -69,11 +72,11 @@ class _UserSettingState extends State<UserSetting> {
           },
           icon: Icon(
             Icons.arrow_back,
-            color: Colors.black,
+            color: AppColors.onPrimary,
           ),
         ),
         elevation: 0,
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.primary,
       ),
       body: SingleChildScrollView(
         child: Padding(

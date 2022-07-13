@@ -34,4 +34,9 @@ router.delete("/achievement/remove", auth.verifyUser, (req, res) => {
   });
 });
 
+router.get("/achievement/getAll", auth.verifyUser, async (req, res)=> {
+  const achievements  = await achievement.find();
+  res.send(achievements);
+})
+
 module.exports = router;

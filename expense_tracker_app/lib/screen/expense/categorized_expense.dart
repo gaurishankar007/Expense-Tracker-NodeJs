@@ -1,27 +1,29 @@
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:expense_tracker/api/http/expense_http.dart';
 import 'package:flutter/material.dart';
 
-import '../api/http/income_http.dart';
-import '../api/res/income_res.dart';
-import '../resource/colors.dart';
+import '../../api/res/expense_res.dart';
+import '../../resource/colors.dart';
 
-class CategorizedIncome extends StatefulWidget {
+class CategorizedExpense extends StatefulWidget {
   final String? category;
-  const CategorizedIncome({Key? key, @required this.category})
+  const CategorizedExpense({Key? key, @required this.category})
       : super(key: key);
 
   @override
-  State<CategorizedIncome> createState() => _CategorizedIncomeState();
+  State<CategorizedExpense> createState() => _CategorizedExpenseState();
 }
 
-class _CategorizedIncomeState extends State<CategorizedIncome> {
-  late Future<List<IncomeData>> incomeCategories;
-  late List<IncomeData> incomeList;
+class _CategorizedExpenseState extends State<CategorizedExpense> {
+  String startDate = "", endDate = "";
+
+  late Future<List<ExpenseData>> expenseCategories;
+  late List<ExpenseData> expenseList;
   String firstDate = "";
-  int incomeAmount = 0;
-  int incomeIndex = 0;
+  int expenseAmount = 0;
+  int expenseIndex = 0;
 
   OutlineInputBorder formBorder = OutlineInputBorder(
     borderRadius: BorderRadius.circular(5),
@@ -32,26 +34,26 @@ class _CategorizedIncomeState extends State<CategorizedIncome> {
     ),
   );
 
-  void getCategorizedIncomes() async {
-    int tempIncomeAmount = 0;
-    incomeCategories = IncomeHttp().getCategorizedIncome(widget.category!);
-    incomeCategories.then((value) {
+  void getCategorizedExpenses() async {
+    int tempExpenseAmount = 0;
+    expenseCategories = ExpenseHttp().getCategorizedExpense(widget.category!);
+    expenseCategories.then((value) {
       for (int i = 0; i < value.length; i++) {
-        tempIncomeAmount = tempIncomeAmount + value[i].amount!;
+        tempExpenseAmount = tempExpenseAmount + value[i].amount!;
       }
       setState(() {
-        incomeList = value;
-        incomeAmount = tempIncomeAmount;
+        expenseList = value;
+        expenseAmount = tempExpenseAmount;
       });
     });
 
-    firstDate = await IncomeHttp().getCategoryStartDate(widget.category!);
+    firstDate = await ExpenseHttp().getCategoryStartDate(widget.category!);
   }
 
   @override
   void initState() {
     super.initState();
-    getCategorizedIncomes();
+    getCategorizedExpenses();
   }
 
   @override
@@ -62,8 +64,8 @@ class _CategorizedIncomeState extends State<CategorizedIncome> {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          child: FutureBuilder<List<IncomeData>>(
-              future: incomeCategories,
+          child: FutureBuilder<List<ExpenseData>>(
+              future: expenseCategories,
               builder: (context, snapshot) {
                 List<Widget> children = [];
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -132,7 +134,7 @@ class _CategorizedIncomeState extends State<CategorizedIncome> {
                                   child: RichText(
                                     text: TextSpan(
                                       text:
-                                          "${widget.category} (Rs. $incomeAmount)",
+                                          "${widget.category} (Rs. $expenseAmount)",
                                       style: TextStyle(
                                         fontSize: 18,
                                         color: AppColors.onPrimary,
@@ -159,7 +161,7 @@ class _CategorizedIncomeState extends State<CategorizedIncome> {
                         ),
                       ),
                       getButtons(context),
-                      viewIncomes(context),
+                      viewExpenses(context),
                     ];
                   } else if (snapshot.hasError) {
                     children = <Widget>[
@@ -203,22 +205,22 @@ class _CategorizedIncomeState extends State<CategorizedIncome> {
             children: [
               ElevatedButton(
                 onPressed: () async {
-                  if (incomeIndex == 0) {
+                  if (expenseIndex == 0) {
                     return;
                   }
 
-                  List<IncomeData> tempIncomeList =
-                      await IncomeHttp().getCategorizedIncome(widget.category!);
-                  int tempIncomeAmount = 0;
-                  for (int i = 0; i < tempIncomeList.length; i++) {
-                    tempIncomeAmount =
-                        tempIncomeAmount + tempIncomeList[i].amount!;
+                  List<ExpenseData> tempExpenseList = await ExpenseHttp()
+                      .getCategorizedExpense(widget.category!);
+                  int tempExpenseAmount = 0;
+                  for (int i = 0; i < tempExpenseList.length; i++) {
+                    tempExpenseAmount =
+                        tempExpenseAmount + tempExpenseList[i].amount!;
                   }
 
                   setState(() {
-                    incomeList = tempIncomeList;
-                    incomeAmount = tempIncomeAmount;
-                    incomeIndex = 0;
+                    expenseList = tempExpenseList;
+                    expenseAmount = tempExpenseAmount;
+                    expenseIndex = 0;
                   });
                 },
                 child: Text(
@@ -226,9 +228,9 @@ class _CategorizedIncomeState extends State<CategorizedIncome> {
                 ),
                 style: ElevatedButton.styleFrom(
                   primary:
-                      incomeIndex == 0 ? AppColors.primary : AppColors.button,
+                      expenseIndex == 0 ? AppColors.primary : AppColors.button,
                   onPrimary:
-                      incomeIndex == 0 ? AppColors.onPrimary : AppColors.text,
+                      expenseIndex == 0 ? AppColors.onPrimary : AppColors.text,
                   minimumSize: Size.zero,
                   padding: EdgeInsets.symmetric(
                     horizontal: 10,
@@ -245,9 +247,9 @@ class _CategorizedIncomeState extends State<CategorizedIncome> {
               ElevatedButton(
                 onPressed: () {
                   setState(() {
-                    incomeList = [];
-                    incomeAmount = 0;
-                    incomeIndex = 1;
+                    expenseList = [];
+                    expenseAmount = 0;
+                    expenseIndex = 1;
                   });
 
                   showDialog(
@@ -260,9 +262,9 @@ class _CategorizedIncomeState extends State<CategorizedIncome> {
                 ),
                 style: ElevatedButton.styleFrom(
                   primary:
-                      incomeIndex == 1 ? AppColors.primary : AppColors.button,
+                      expenseIndex == 1 ? AppColors.primary : AppColors.button,
                   onPrimary:
-                      incomeIndex == 1 ? AppColors.onPrimary : AppColors.text,
+                      expenseIndex == 1 ? AppColors.onPrimary : AppColors.text,
                   minimumSize: Size.zero,
                   padding: EdgeInsets.symmetric(
                     horizontal: 10,
@@ -275,7 +277,7 @@ class _CategorizedIncomeState extends State<CategorizedIncome> {
               )
             ],
           ),
-        ),
+        )
       ],
     );
   }
@@ -369,19 +371,19 @@ class _CategorizedIncomeState extends State<CategorizedIncome> {
                       fontSize: 16.0,
                     );
                   } else {
-                    List<IncomeData> tempIncomeList = await IncomeHttp()
-                        .getCategorizedSpecificIncome(
+                    List<ExpenseData> tempExpenseList = await ExpenseHttp()
+                        .getCategorizedSpecificExpense(
                             widget.category!, startDate, endDate);
 
-                    int tempIncomeAmount = 0;
-                    for (int i = 0; i < tempIncomeList.length; i++) {
-                      tempIncomeAmount =
-                          tempIncomeAmount + tempIncomeList[i].amount!;
+                    int tempExpenseAmount = 0;
+                    for (int i = 0; i < tempExpenseList.length; i++) {
+                      tempExpenseAmount =
+                          tempExpenseAmount + tempExpenseList[i].amount!;
                     }
 
                     setState(() {
-                      incomeList = tempIncomeList;
-                      incomeAmount = tempIncomeAmount;
+                      expenseList = tempExpenseList;
+                      expenseAmount = tempExpenseAmount;
                     });
 
                     Navigator.pop(context);
@@ -413,15 +415,15 @@ class _CategorizedIncomeState extends State<CategorizedIncome> {
     );
   }
 
-  Widget viewIncomes(BuildContext context) {
+  Widget viewExpenses(BuildContext context) {
     final sWidth = MediaQuery.of(context).size.width;
 
-    return incomeList.isEmpty
+    return expenseList.isEmpty
         ? SizedBox(
             height: 200,
             child: Center(
               child: Text(
-                "No incomes",
+                "No expenses",
                 style: TextStyle(
                   color: AppColors.text,
                   fontWeight: FontWeight.bold,
@@ -438,7 +440,7 @@ class _CategorizedIncomeState extends State<CategorizedIncome> {
             child: ListView.builder(
               physics: NeverScrollableScrollPhysics(),
               shrinkWrap: true,
-              itemCount: incomeList.length,
+              itemCount: expenseList.length,
               itemBuilder: ((context, index) {
                 return ListTile(
                   onTap: () {},
@@ -454,20 +456,20 @@ class _CategorizedIncomeState extends State<CategorizedIncome> {
                     ),
                   ),
                   title: Text(
-                    incomeList[index].name!,
+                    expenseList[index].name!,
                     style: TextStyle(
                       color: AppColors.text,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   subtitle: Text(
-                    incomeList[index].createdAt!.split("T")[0],
+                    expenseList[index].createdAt!.split("T")[0],
                     style: TextStyle(
                       color: AppColors.text,
                     ),
                   ),
                   trailing: Text(
-                    "Rs. " + incomeList[index].amount!.toString(),
+                    "Rs. " + expenseList[index].amount!.toString(),
                     style: TextStyle(
                       color: AppColors.text,
                       fontWeight: FontWeight.bold,

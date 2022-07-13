@@ -2,8 +2,8 @@ import 'package:expense_tracker/api/http/home_http.dart';
 import 'package:expense_tracker/api/res/expense_res.dart';
 import 'package:expense_tracker/api/res/home_res.dart';
 import 'package:expense_tracker/resource/category.dart';
-import 'package:expense_tracker/screen/categorized_expense.dart';
-import 'package:expense_tracker/screen/categorized_income.dart';
+import 'package:expense_tracker/screen/expense/categorized_expense.dart';
+import 'package:expense_tracker/screen/income/categorized_income.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -103,147 +103,141 @@ class _HomeState extends State<Home> {
             top: 10,
             bottom: 10,
           ),
-          child: Column(
-            children: [
-              FutureBuilder<HomeData>(
-                future: userHomeData,
-                builder: ((context, snapshot) {
-                  List<Widget> children = [];
-                  if (snapshot.connectionState == ConnectionState.waiting) {
+          child: FutureBuilder<HomeData>(
+            future: userHomeData,
+            builder: ((context, snapshot) {
+              List<Widget> children = [];
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                children = <Widget>[
+                  Container(
+                    width: sWidth,
+                    height: sHeight,
+                    alignment: Alignment.center,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 3,
+                      color: AppColors.primary,
+                    ),
+                  )
+                ];
+              } else {
+                if (snapshot.hasData) {
+                  children = <Widget>[
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: sWidth * 0.03,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            greeting,
+                            style: TextStyle(
+                              color: AppColors.text,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          IconButton(
+                            constraints: BoxConstraints(),
+                            padding: EdgeInsets.zero,
+                            icon: Icon(
+                              Icons.settings,
+                              color: AppColors.primary,
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (builder) => Setting(),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    barChart(
+                      context,
+                      snapshot.data!.thisMonthView!,
+                      snapshot.data!.thisMonthExpenseAmount!,
+                      snapshot.data!.thisMonthIncomeAmount!,
+                      snapshot.data!.previousMonthExpenseAmount!,
+                      snapshot.data!.previousMonthIncomeAmount!,
+                    ),
+                    feedback(context, snapshot.data!),
+                    expenseDetail(
+                        context, snapshot.data!.thisMonthExpenseCategories!),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    incomeDetail(
+                      context,
+                      snapshot.data!.thisMonthIncomeCategories!,
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    snapshot.data!.expenseDays!.length > 2
+                        ? expenseLineChart(
+                            context,
+                            snapshot.data!.thisMonthView!,
+                            snapshot.data!.expenseDays!,
+                            snapshot.data!.expenseAmounts!,
+                            snapshot.data!.maxExpenseAmount!,
+                          )
+                        : SizedBox(),
+                  ];
+                } else if (snapshot.hasError) {
+                  if ("${snapshot.error}".split("Exception: ")[0] == "Socket") {
                     children = <Widget>[
                       Container(
                         width: sWidth,
                         height: sHeight,
                         alignment: Alignment.center,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 3,
-                          color: AppColors.primary,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(
+                              Icons.warning_rounded,
+                              size: 25,
+                              color: Colors.red,
+                            ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Text(
+                              "Connection Problem",
+                              style: TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.bold),
+                            ),
+                          ],
                         ),
                       )
                     ];
                   } else {
-                    if (snapshot.hasData) {
-                      children = <Widget>[
-                        Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: sWidth * 0.03,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                greeting,
-                                style: TextStyle(
-                                  color: AppColors.text,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              IconButton(
-                                constraints: BoxConstraints(),
-                                padding: EdgeInsets.zero,
-                                icon: Icon(
-                                  Icons.settings,
-                                  color: AppColors.primary,
-                                ),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (builder) => Setting(),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ],
+                    children = <Widget>[
+                      Container(
+                        width: sWidth,
+                        height: sHeight,
+                        alignment: Alignment.center,
+                        child: Text(
+                          "${snapshot.error}",
+                          style: TextStyle(
+                            fontSize: 15,
                           ),
                         ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        barChart(
-                          context,
-                          snapshot.data!.thisMonthView!,
-                          snapshot.data!.thisMonthExpenseAmount!,
-                          snapshot.data!.thisMonthIncomeAmount!,
-                          snapshot.data!.previousMonthExpenseAmount!,
-                          snapshot.data!.previousMonthIncomeAmount!,
-                        ),
-                        feedback(context, snapshot.data!),
-                        expenseDetail(context,
-                            snapshot.data!.thisMonthExpenseCategories!),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        incomeDetail(
-                          context,
-                          snapshot.data!.thisMonthIncomeCategories!,
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        snapshot.data!.expenseDays!.length > 2
-                            ? expenseLineChart(
-                                context,
-                                snapshot.data!.thisMonthView!,
-                                snapshot.data!.expenseDays!,
-                                snapshot.data!.expenseAmounts!,
-                                snapshot.data!.maxExpenseAmount!,
-                              )
-                            : SizedBox(),
-                      ];
-                    } else if (snapshot.hasError) {
-                      if ("${snapshot.error}".split("Exception: ")[0] ==
-                          "Socket") {
-                        children = <Widget>[
-                          Container(
-                            width: sWidth,
-                            height: sHeight,
-                            alignment: Alignment.center,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Icon(
-                                  Icons.warning_rounded,
-                                  size: 25,
-                                  color: Colors.red,
-                                ),
-                                SizedBox(
-                                  width: 5,
-                                ),
-                                Text(
-                                  "Connection Problem",
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
-                          )
-                        ];
-                      } else {
-                        children = <Widget>[
-                          Container(
-                            width: sWidth,
-                            height: sHeight,
-                            alignment: Alignment.center,
-                            child: Text(
-                              "${snapshot.error}",
-                              style: TextStyle(
-                                fontSize: 15,
-                              ),
-                            ),
-                          )
-                        ];
-                      }
-                    }
+                      )
+                    ];
                   }
-                  return Column(
-                    children: children,
-                  );
-                }),
-              )
-            ],
+                }
+              }
+              return Column(
+                children: children,
+              );
+            }),
           ),
         ),
       ),
@@ -570,27 +564,23 @@ class _HomeState extends State<Home> {
     return Padding(
       padding: EdgeInsets.symmetric(
         vertical: 10,
+        horizontal: sWidth * 0.03,
       ),
       child: Column(
         children: [
-          Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: sWidth * 0.03,
-            ),
-            child: Row(
-              children: [
-                Text(
-                  thisMonthView
-                      ? "This" " Month Expenses"
-                      : "Previous" " Month Expenses",
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: AppColors.text,
-                    fontWeight: FontWeight.bold,
-                  ),
+          Row(
+            children: [
+              Text(
+                thisMonthView
+                    ? "This" " Month Expenses"
+                    : "Previous" " Month Expenses",
+                style: TextStyle(
+                  fontSize: 18,
+                  color: AppColors.text,
+                  fontWeight: FontWeight.bold,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
           SizedBox(
             height: 10,
