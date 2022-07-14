@@ -30,6 +30,10 @@ app.use(achievement);
 const progress = require("./router/progressRoute");
 app.use(progress);
 
-app.listen(8848, () => {
+const dotenv = require("dotenv");
+dotenv.config();
+const port = process.env.PORT || 8848;
+
+app.listen(port, () => {
   console.log("Server running on port: 8848...");
 });

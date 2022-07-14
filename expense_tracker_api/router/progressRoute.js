@@ -2,6 +2,7 @@ const express = require("express");
 const router = new express.Router();
 const auth = require("../authentication/auth");
 const progress = require("../model/progressModel");
+const user = require("../model/userModel");
 
 router.get("/user/getProgress", auth.verifyUser, async (req, res) => {
   const userProgress = await progress
@@ -14,28 +15,30 @@ router.get("/user/getProgress", auth.verifyUser, async (req, res) => {
 });
 
 router.get("/users/progresses", auth.verifyUser, async (req, res) => {
+  const users  = await user.find({progressPublication: true});
+
   const progressPoints = await progress
-    .find()
+    .find({user: {$in: users}})
     .populate("user")
     .populate("oldAchievement")
     .populate("newAchievement")
-    .sort({ progress: 1 })
+    .sort({ progress: -1 })
     .limit(20);
 
   const tmpPoints = await progress
-    .find()
+    .find({user: {$in: users}})
     .populate("user")
     .populate("oldAchievement")
     .populate("newAchievement")
-    .sort({ tmp: 1 })
+    .sort({ tmp: -1 })
     .limit(20);
 
   const pmpPoints = await progress
-    .find()
+    .find({user: {$in: users}})
     .populate("user")
     .populate("oldAchievement")
     .populate("newAchievement")
-    .sort({ pmp: 1 })
+    .sort({ pmp: -1 })
     .limit(20);
 
   res.send({

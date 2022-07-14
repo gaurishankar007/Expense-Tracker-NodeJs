@@ -14,7 +14,7 @@ class ProgressHttp {
   Future<ProgressData> getUserProgress() async {
     try {
       final response = await get(
-        Uri.parse(routeUrl + "user/getProgress"),
+        Uri.parse(routeUrl + ProgressUrls.getUserProgress),
         headers: {
           HttpHeaders.authorizationHeader: "Bearer $token",
         },
@@ -31,7 +31,7 @@ class ProgressHttp {
   Future<TopProgress> topUsersProgress() async {
     try {
       final response = await get(
-        Uri.parse(routeUrl + "users/progresses"),
+        Uri.parse(routeUrl + ProgressUrls.topUsersProgress),
         headers: {
           HttpHeaders.authorizationHeader: "Bearer $token",
         },

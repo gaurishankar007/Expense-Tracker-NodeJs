@@ -33,7 +33,7 @@ class _SettingState extends State<Setting> {
     if (image == null) return;
     PlatformFile file = image.files.first;
 
-    await UserHttp().ChangeProfilePicture(File(file.path.toString()));
+    await UserHttp().changeProfilePicture(File(file.path.toString()));
     setState(() {
       getUser = UserHttp().getUser();
     });

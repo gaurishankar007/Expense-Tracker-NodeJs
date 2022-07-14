@@ -14,7 +14,7 @@ class HomeHttp {
   Future<HomeData> viewHome() async {
     try {
       final response = await get(
-        Uri.parse(routeUrl + "user/getHome"),
+        Uri.parse(routeUrl + HomeUrls.viewHome),
         headers: {
           HttpHeaders.authorizationHeader: "Bearer $token",
         },

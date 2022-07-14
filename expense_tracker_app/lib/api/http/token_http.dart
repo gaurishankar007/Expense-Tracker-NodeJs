@@ -13,7 +13,7 @@ class TokenHttp {
   Future<Map> generateToken(String email, String password) async {
     try {
       final response = await post(
-        Uri.parse(routeUrl + "generate/token"),
+        Uri.parse(routeUrl + TokenUrls.generateToken),
         body: {"email": email, "password": password},
         headers: {
           HttpHeaders.authorizationHeader: "Bearer $token",
@@ -32,7 +32,7 @@ class TokenHttp {
   Future<Map> verifyToken(String tokenNumber, String userId) async {
     try {
       final response = await put(
-        Uri.parse(routeUrl + "verify/token"),
+        Uri.parse(routeUrl + TokenUrls.verifyToken),
         body: {"tokenNumber": tokenNumber, "userId": userId},
         headers: {
           HttpHeaders.authorizationHeader: "Bearer $token",

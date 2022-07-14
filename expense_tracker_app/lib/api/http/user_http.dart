@@ -22,7 +22,7 @@ class UserHttp {
       };
 
       final response = await put(
-        Uri.parse(routeUrl + "user/changePassword"),
+        Uri.parse(routeUrl + UserUrls.changePassword),
         body: userData,
         headers: {
           HttpHeaders.authorizationHeader: "Bearer $token",
@@ -41,7 +41,7 @@ class UserHttp {
   Future<User> getUser() async {
     try {
       final response = await get(
-        Uri.parse(routeUrl + "user/view"),
+        Uri.parse(routeUrl + UserUrls.getUser),
         headers: {
           HttpHeaders.authorizationHeader: "Bearer $token",
         },
@@ -53,11 +53,11 @@ class UserHttp {
     }
   }
 
-  Future<Map> ChangeProfilePicture(File profilePicture) async {
+  Future<Map> changeProfilePicture(File profilePicture) async {
     try {
       // Making multipart request
       var request = http.MultipartRequest(
-          'PUT', Uri.parse(routeUrl + "user/changeProfilePicture"));
+          'PUT', Uri.parse(routeUrl + UserUrls.changeProfilePicture));
 
       // Adding headers
       request.headers.addAll({
@@ -89,7 +89,7 @@ class UserHttp {
   Future<Map> changeProfileName(String profileName) async {
     try {
       final response = await put(
-        Uri.parse(routeUrl + "user/changeProfileName"),
+        Uri.parse(routeUrl + UserUrls.changeProfileName),
         body: {"profile_name": profileName},
         headers: {
           HttpHeaders.authorizationHeader: "Bearer $token",
@@ -109,7 +109,7 @@ class UserHttp {
   Future<Map> changeEmail(String email) async {
     try {
       final response = await put(
-        Uri.parse(routeUrl + "user/changeEmail"),
+        Uri.parse(routeUrl + UserUrls.changeEmail),
         body: {"email": email},
         headers: {
           HttpHeaders.authorizationHeader: "Bearer $token",
@@ -129,7 +129,7 @@ class UserHttp {
   Future<Map> changeGender(String gender) async {
     try {
       final response = await put(
-        Uri.parse(routeUrl + "user/changeGender"),
+        Uri.parse(routeUrl + UserUrls.changeGender),
         body: {"gender": gender},
         headers: {
           HttpHeaders.authorizationHeader: "Bearer $token",
@@ -149,8 +149,9 @@ class UserHttp {
   Future<Map> publicProgress() async {
     try {
       final response = await get(
-          Uri.parse(routeUrl + "user/progressPublication"),
-          headers: {HttpHeaders.authorizationHeader: "Bearer $token"});
+        Uri.parse(routeUrl + UserUrls.publicProgress),
+        headers: {HttpHeaders.authorizationHeader: "Bearer $token"},
+      );
 
       return jsonDecode(response.body) as Map;
     } catch (error) {

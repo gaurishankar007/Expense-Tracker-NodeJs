@@ -67,14 +67,14 @@ class ProgressData {
 
 @JsonSerializable(explicitToJson: true)
 class TopProgress {
-  List<Progress>? progress;
-  List<Progress>? tmp;
-  List<Progress>? pmp;
+  List<Progress>? progressPoints;
+  List<Progress>? tmpPoints;
+  List<Progress>? pmpPoints;
 
   TopProgress({
-    this.progress,
-    this.tmp,
-    this.pmp,
+    this.progressPoints,
+    this.tmpPoints,
+    this.pmpPoints,
   });
 
   factory TopProgress.fromJson(Map<String, dynamic> json) =>

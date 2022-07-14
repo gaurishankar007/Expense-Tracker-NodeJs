@@ -81,82 +81,71 @@ class _CategorizedIncomeState extends State<CategorizedIncome> {
                 } else if (snapshot.connectionState == ConnectionState.done) {
                   if (snapshot.hasData) {
                     children = <Widget>[
-                      Container(
-                        decoration: BoxDecoration(
-                          boxShadow: const [
-                            BoxShadow(
-                                color: Colors.black38,
-                                spreadRadius: 1,
-                                blurRadius: 5,
-                                offset: Offset(0, 2))
-                          ],
-                        ),
-                        child: Stack(
-                          alignment: Alignment.topLeft,
-                          children: [
-                            Stack(
-                              alignment: Alignment.bottomLeft,
-                              children: [
-                                Stack(
-                                  children: [
-                                    ClipRRect(
-                                      child: Image(
-                                        width: sWidth,
-                                        height: sHeight * .3,
-                                        fit: BoxFit.cover,
-                                        image: AssetImage(
-                                          "image/category/${widget.category}.jpg",
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
+                      Stack(
+                        alignment: Alignment.topLeft,
+                        children: [
+                          Stack(
+                            alignment: Alignment.bottomLeft,
+                            children: [
+                              Stack(
+                                children: [
+                                  ClipRRect(
+                                    child: Image(
                                       width: sWidth,
                                       height: sHeight * .3,
-                                      decoration: BoxDecoration(
-                                        boxShadow: const [
-                                          BoxShadow(
-                                            color: Colors.black38,
-                                            spreadRadius: 1,
-                                            blurRadius: 5,
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: sWidth * 0.015,
-                                    vertical: 5,
-                                  ),
-                                  child: RichText(
-                                    text: TextSpan(
-                                      text:
-                                          "${widget.category} (Rs. $incomeAmount)",
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        color: AppColors.onPrimary,
-                                        fontWeight: FontWeight.bold,
+                                      fit: BoxFit.cover,
+                                      image: AssetImage(
+                                        "image/category/${widget.category}.jpg",
                                       ),
                                     ),
                                   ),
-                                )
-                              ],
-                            ),
-                            IconButton(
-                              padding: EdgeInsets.all(5.0),
-                              constraints: BoxConstraints(),
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              icon: Icon(
-                                Icons.arrow_back_outlined,
-                                color: AppColors.onPrimary,
-                                size: 25,
+                                  Container(
+                                    width: sWidth,
+                                    height: sHeight * .3,
+                                    decoration: BoxDecoration(
+                                      boxShadow: const [
+                                        BoxShadow(
+                                          color: Colors.black38,
+                                          spreadRadius: 1,
+                                          blurRadius: 5,
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: sWidth * 0.015,
+                                  vertical: 5,
+                                ),
+                                child: RichText(
+                                  text: TextSpan(
+                                    text:
+                                        "${widget.category} (Rs. $incomeAmount)",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: AppColors.onPrimary,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                          IconButton(
+                            padding: EdgeInsets.all(5.0),
+                            constraints: BoxConstraints(),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            icon: Icon(
+                              Icons.arrow_back_outlined,
+                              color: AppColors.onPrimary,
+                              size: 25,
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                       getButtons(context),
                       viewIncomes(context),

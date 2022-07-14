@@ -90,9 +90,17 @@ class _ResultState extends State<Result> {
                             ),
                           ],
                         ),
-                        IconButton(
-                          constraints: BoxConstraints(),
-                          padding: EdgeInsets.zero,
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            primary: AppColors.primary,
+                            minimumSize: Size.zero,
+                            padding: EdgeInsets.all(5),
+                            elevation: 10,
+                            shadowColor: Colors.black,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                          ),
                           onPressed: () {
                             Navigator.push(
                               context,
@@ -101,10 +109,29 @@ class _ResultState extends State<Result> {
                               ),
                             );
                           },
-                          icon: Icon(
-                            FontAwesomeIcons.rankingStar,
-                            color: AppColors.primary,
-                            size: 20,
+                          child: SizedBox(
+                            height: 15,
+                            width: 55,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: const [
+                                Icon(
+                                  FontAwesomeIcons.rankingStar,
+                                  size: 16,
+                                ),
+                                SizedBox(
+                                  width: 5,
+                                ),
+                                Text(
+                                  "Rank",
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -122,6 +149,52 @@ class _ResultState extends State<Result> {
                     previousMonthAchievements(
                       context,
                       snapshot.data!.progress!.oldAchievement!,
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        primary: AppColors.primary,
+                        minimumSize: Size.zero,
+                        padding: EdgeInsets.all(0),
+                        elevation: 10,
+                        shadowColor: Colors.black,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (builder) => AllAchievements(),
+                          ),
+                        );
+                      },
+                      child: SizedBox(
+                        height: 40,
+                        width: 145,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(
+                              FontAwesomeIcons.medal,
+                              size: 20,
+                            ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Text(
+                              "Achievements",
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ];
                 } else if (snapshot.hasError) {
@@ -409,35 +482,13 @@ class _ResultState extends State<Result> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "New Achievements",
-                style: TextStyle(
-                  fontSize: 18,
-                  color: AppColors.text,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              IconButton(
-                constraints: BoxConstraints(),
-                padding: EdgeInsets.zero,
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (builder) => AllAchievements(),
-                    ),
-                  );
-                },
-                icon: Icon(
-                  FontAwesomeIcons.medal,
-                  color: AppColors.primary,
-                  size: 20,
-                ),
-              ),
-            ],
+          Text(
+            "New Achievements",
+            style: TextStyle(
+              fontSize: 18,
+              color: AppColors.text,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           SizedBox(
             height: 10,
@@ -514,35 +565,13 @@ class _ResultState extends State<Result> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Old Achievements",
-                style: TextStyle(
-                  fontSize: 18,
-                  color: AppColors.text,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              IconButton(
-                constraints: BoxConstraints(),
-                padding: EdgeInsets.zero,
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (builder) => AllAchievements(),
-                    ),
-                  );
-                },
-                icon: Icon(
-                  FontAwesomeIcons.medal,
-                  color: AppColors.primary,
-                  size: 20,
-                ),
-              ),
-            ],
+          Text(
+            "Old Achievements",
+            style: TextStyle(
+              fontSize: 18,
+              color: AppColors.text,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           SizedBox(
             height: 10,

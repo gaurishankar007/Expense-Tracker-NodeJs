@@ -14,7 +14,7 @@ class AchievementHttp {
   Future<List<Achievement>> getAllAchievements() async {
     try {
       final response = await get(
-        Uri.parse(routeUrl + "achievement/getAll"),
+        Uri.parse(routeUrl + AchievementUrls.getAllAchievements),
         headers: {
           HttpHeaders.authorizationHeader: "Bearer $token",
         },

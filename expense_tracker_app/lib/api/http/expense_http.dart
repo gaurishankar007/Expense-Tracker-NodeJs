@@ -21,7 +21,7 @@ class ExpenseHttp {
       };
 
       final response = await post(
-        Uri.parse(routeUrl + "expense/add"),
+        Uri.parse(routeUrl + ExpenseUrls.addExpense),
         body: expenseData,
         headers: {
           HttpHeaders.authorizationHeader: "Bearer $token",
@@ -40,7 +40,7 @@ class ExpenseHttp {
   Future<ExpenseDWM> getExpenseDWM() async {
     try {
       final response = await get(
-        Uri.parse(routeUrl + "expense/getDWM"),
+        Uri.parse(routeUrl + ExpenseUrls.getExpenseDWM),
         headers: {
           HttpHeaders.authorizationHeader: "Bearer $token",
         },
@@ -58,7 +58,7 @@ class ExpenseHttp {
       String startDate, String endDate) async {
     try {
       final response = await post(
-        Uri.parse(routeUrl + "expense/getSpecific"),
+        Uri.parse(routeUrl + ExpenseUrls.getExpenseSpecific),
         body: {"startDate": startDate, "endDate": endDate},
         headers: {
           HttpHeaders.authorizationHeader: "Bearer $token",
@@ -76,7 +76,7 @@ class ExpenseHttp {
   Future<Map> removeExpense(String expenseId) async {
     try {
       final response = await delete(
-        Uri.parse(routeUrl + "expense/remove"),
+        Uri.parse(routeUrl + ExpenseUrls.removeExpense),
         body: {"expenseId": expenseId},
         headers: {
           HttpHeaders.authorizationHeader: "Bearer $token",
@@ -99,7 +99,7 @@ class ExpenseHttp {
       };
 
       final response = await put(
-        Uri.parse(routeUrl + "expense/edit"),
+        Uri.parse(routeUrl + ExpenseUrls.editExpense),
         body: expenseData,
         headers: {
           HttpHeaders.authorizationHeader: "Bearer $token",
@@ -118,7 +118,7 @@ class ExpenseHttp {
   Future<List<ExpenseData>> getCategorizedExpense(String category) async {
     try {
       final response = await post(
-        Uri.parse(routeUrl + "expense/categorized"),
+        Uri.parse(routeUrl + ExpenseUrls.getCategorizedExpense),
         body: {
           "category": category,
         },
@@ -145,7 +145,7 @@ class ExpenseHttp {
       };
 
       final response = await post(
-        Uri.parse(routeUrl + "expense/categorizedSpecific"),
+        Uri.parse(routeUrl + ExpenseUrls.getCategorizedSpecificExpense),
         body: expenseData,
         headers: {
           HttpHeaders.authorizationHeader: "Bearer $token",
@@ -163,7 +163,7 @@ class ExpenseHttp {
   Future<String> getCategoryStartDate(String category) async {
     try {
       final response = await post(
-        Uri.parse(routeUrl + "expense/getCategoryStartDate"),
+        Uri.parse(routeUrl + ExpenseUrls.getCategoryStartDate),
         body: {
           "category": category,
         },

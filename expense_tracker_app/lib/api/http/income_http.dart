@@ -20,7 +20,7 @@ class IncomeHttp {
         "category": incomeDetail.category!,
       };
       final response = await post(
-        Uri.parse(routeUrl + "income/add"),
+        Uri.parse(routeUrl + IncomeUrls.addIncome),
         body: incomeData,
         headers: {
           HttpHeaders.authorizationHeader: "Bearer $token",
@@ -39,7 +39,7 @@ class IncomeHttp {
   Future<IncomeDWM> getIncomeDWM() async {
     try {
       final response = await get(
-        Uri.parse(routeUrl + "income/getDWM"),
+        Uri.parse(routeUrl + IncomeUrls.getIncomeDWM),
         headers: {
           HttpHeaders.authorizationHeader: "Bearer $token",
         },
@@ -57,7 +57,7 @@ class IncomeHttp {
       String startDate, String endDate) async {
     try {
       final response = await post(
-        Uri.parse(routeUrl + "income/getSpecific"),
+        Uri.parse(routeUrl + IncomeUrls.getIncomeSpecific),
         body: {"startDate": startDate, "endDate": endDate},
         headers: {
           HttpHeaders.authorizationHeader: "Bearer $token",
@@ -75,7 +75,7 @@ class IncomeHttp {
   Future<Map> removeIncome(String incomeId) async {
     try {
       final response = await delete(
-        Uri.parse(routeUrl + "income/remove"),
+        Uri.parse(routeUrl + IncomeUrls.removeIncome),
         body: {"incomeId": incomeId},
         headers: {
           HttpHeaders.authorizationHeader: "Bearer $token",
@@ -98,7 +98,7 @@ class IncomeHttp {
       };
 
       final response = await put(
-        Uri.parse(routeUrl + "income/edit"),
+        Uri.parse(routeUrl + IncomeUrls.editIncome),
         body: incomeData,
         headers: {
           HttpHeaders.authorizationHeader: "Bearer $token",
@@ -117,7 +117,7 @@ class IncomeHttp {
   Future<List<IncomeData>> getCategorizedIncome(String category) async {
     try {
       final response = await post(
-        Uri.parse(routeUrl + "income/categorized"),
+        Uri.parse(routeUrl + IncomeUrls.getCategorizedIncome),
         body: {
           "category": category,
         },
@@ -144,7 +144,7 @@ class IncomeHttp {
       };
 
       final response = await post(
-        Uri.parse(routeUrl + "income/categorizedSpecific"),
+        Uri.parse(routeUrl + IncomeUrls.getCategorizedSpecificIncome),
         body: incomeData,
         headers: {
           HttpHeaders.authorizationHeader: "Bearer $token",
@@ -162,7 +162,7 @@ class IncomeHttp {
   Future<String> getCategoryStartDate(String category) async {
     try {
       final response = await post(
-        Uri.parse(routeUrl + "income/getCategoryStartDate"),
+        Uri.parse(routeUrl + IncomeUrls.getCategoryStartDate),
         body: {
           "category": category,
         },

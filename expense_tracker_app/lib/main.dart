@@ -7,6 +7,26 @@ import 'screen/home.dart';
 void main() {
   WidgetsFlutterBinding();
 
+  ErrorWidget.builder = (FlutterErrorDetails details) {
+    return Material(
+      child: Container(
+        color: Colors.green,
+        child: Center(
+          child: Text(
+            details.exception.toString(),
+            textAlign: TextAlign.center,
+            softWrap: true,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
+    );
+  };
+
   LogStatus().getToken().then(
     (value) {
       if (value.isNotEmpty) {
