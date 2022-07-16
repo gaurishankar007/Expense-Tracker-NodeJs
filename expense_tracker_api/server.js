@@ -10,25 +10,29 @@ app.use(express.static(__dirname + "/upload"));
 require("./database/connectDB");
 
 const userRoute = require("./router/userRoute");
-app.use(userRoute);
+app.use("/user", userRoute);
 
-const token = require("./router/tokenRoute");
-app.use(token);
+const tokenRoute = require("./router/tokenRoute");
+app.use("/token", tokenRoute);
 
-const expense = require("./router/expenseRoute");
-app.use(expense);
+const expenseRoute = require("./router/expenseRoute");
+app.use("/expense", expenseRoute);
 
-const income = require("./router/incomeRoute");
-app.use(income);
+const incomeRoute = require("./router/incomeRoute");
+app.use("/income", incomeRoute);
 
-const home = require("./router/homeRoute");
-app.use(home);
+const homeRoute = require("./router/homeRoute");
+app.use("/home", homeRoute);
 
-const achievement = require("./router/achievementRoute");
-app.use(achievement);
+const achievementRoute = require("./router/achievementRoute");
+app.use("/achievement", achievementRoute);
 
-const progress = require("./router/progressRoute");
-app.use(progress);
+const progressRoute = require("./router/progressRoute");
+app.use("/progress", progressRoute);
+
+const { notFound, errorHandler } = require("./middleware/errorMiddleware");
+app.use(notFound);
+app.use(errorHandler);
 
 const dotenv = require("dotenv");
 dotenv.config();
