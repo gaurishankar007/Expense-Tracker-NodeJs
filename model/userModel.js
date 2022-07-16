@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema(
 
     profilePicture: {
       type: String,
-      default: "user.png"
+      default: "https://res.cloudinary.com/gaurishankar/image/upload/v1657982085/xstpveuuak5kzekmmm9y.png"
     },
 
     gender: {

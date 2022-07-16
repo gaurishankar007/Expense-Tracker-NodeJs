@@ -1,7 +1,6 @@
 const express = require("express");
 const router = new express.Router();
 const { verifyUser } = require("../middleware/authMiddleware");
-const profileUpload = require("../setting/profileSetting.js");
 const {
   registerUser,
   loginUser,
@@ -20,12 +19,7 @@ router.post("/login", loginUser);
 
 router.get("/view", verifyUser, viewUser);
 
-router.put(
-  "/changeProfilePicture",
-  verifyUser,
-  profileUpload.single("profile"),
-  changeProfilePicture
-);
+router.put("/changeProfilePicture", verifyUser, changeProfilePicture);
 
 router.put("/changeEmail", verifyUser, changeEmail);
 

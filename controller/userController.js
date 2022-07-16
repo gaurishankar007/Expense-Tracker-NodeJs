@@ -1,7 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const fs = require("fs");
+const fsExtra = require("fs-extra");
 const { cloudinary } = require("../utils/cloudinary");
 const user = require("../model/userModel");
 const progress = require("../model/progressModel");
@@ -105,34 +105,40 @@ const viewUser = (req, res) => {
 };
 
 const changeProfilePicture = asyncHandler(async (req, res) => {
-  if (req.file == undefined) {
+  const file = req.files.profile;
+
+  if (
+    file.mimetype == "image/png" ||
+    file.mimetype == "image/jpeg" ||
+    file.mimetype == "application/octet-stream"
+  ) {
+    const cloudinaryUploader = await cloudinary.uploader.upload(
+      file.tempFilePath,
+      {
+        upload_preset: "expense_income_tracker",
+      }
+    );
+
+    user.findOne({ _id: req.userInfo._id }).then((userData) => {
+      if (userData.profilePicture !== "https://res.cloudinary.com/gaurishankar/image/upload/v1657982085/xstpveuuak5kzekmmm9y.png") {
+      }
+
+      fsExtra.emptyDirSync("../Expense-Tracker-API/tmp");
+
+      user
+        .updateOne(
+          { _id: req.userInfo._id },
+          { profilePicture: cloudinaryUploader.url }
+        )
+        .then(() => {
+          res.send({ resM: "Profile Picture Updated" });
+        });
+    });
+  } else {
     return res.status(400).send({
-      resM: "Invalid image format, only supports png or jpeg image format.",
+      resM: "Invalid image format, only supports only one png or jpeg image format.",
     });
   }
-
-  console.log(req.file);
-
-  const cloudinaryUploader = await cloudinary.uploader.upload(req.file.path, {
-    upload_preset: "expense_income_tracker",
-  });
-
-  console.log(cloudinaryUploader);
-
-  user.findOne({ _id: req.userInfo._id }).then((userData) => {
-    // if (userData.profilePicture !== "user.png") {
-    //   fs.unlinkSync(`../expense_tracker_api/upload/${userData.profilePicture}`);
-    // }
-
-    user
-      .updateOne(
-        { _id: req.userInfo._id },
-        // { profilePicture: req.file.filename }
-      )
-      .then(() => {
-        res.send({ resM: "Profile Picture Updated" });
-      });
-  });
 });
 
 const changeEmail = (req, res) => {
