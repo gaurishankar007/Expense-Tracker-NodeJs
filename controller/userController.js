@@ -47,6 +47,9 @@ const registerUser = (req, res) => {
       return;
     }
 
+    const currentDate = new Date();
+    const previousMonth = new Date(currentDate.getTime() - 2592000000);
+
     bcryptjs.hash(password, 10, async function (e, hashed_value) {
       const newUser = await user.create({
         email: email,
@@ -56,6 +59,7 @@ const registerUser = (req, res) => {
 
       const newProgress = new progress({
         user: newUser._id,
+        pmc: previousMonth,
       });
 
       newProgress.save().then(() => {
@@ -119,21 +123,16 @@ const changeProfilePicture = asyncHandler(async (req, res) => {
       }
     );
 
-    user.findOne({ _id: req.userInfo._id }).then((userData) => {
-      if (userData.profilePicture !== "https://res.cloudinary.com/gaurishankar/image/upload/v1657982085/xstpveuuak5kzekmmm9y.png") {
-      }
+    user
+      .updateOne(
+        { _id: req.userInfo._id },
+        { profilePicture: cloudinaryUploader.url }
+      )
+      .then(() => {
+        res.send({ resM: "Profile Picture Updated" });
+      });
 
-      fsExtra.emptyDirSync("../Expense-Tracker-API/tmp");
-
-      user
-        .updateOne(
-          { _id: req.userInfo._id },
-          { profilePicture: cloudinaryUploader.url }
-        )
-        .then(() => {
-          res.send({ resM: "Profile Picture Updated" });
-        });
-    });
+    fsExtra.emptyDirSync("../EXPENSE-TRACKER-API/tmp");
   } else {
     return res.status(400).send({
       resM: "Invalid image format, only supports only one png or jpeg image format.",

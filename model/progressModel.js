@@ -37,8 +37,7 @@ const progressSchema = new mongoose.Schema(
     ],
 
     pmc: {
-      type: Boolean,
-      default: false,
+      type: Date,
     },
   },
   {
