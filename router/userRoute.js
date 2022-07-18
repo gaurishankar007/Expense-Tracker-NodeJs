@@ -1,5 +1,6 @@
 const express = require("express");
 const router = new express.Router();
+const upload = require("../utils/multer");
 const { verifyUser } = require("../middleware/authMiddleware");
 const {
   registerUser,
@@ -19,7 +20,12 @@ router.post("/login", loginUser);
 
 router.get("/view", verifyUser, viewUser);
 
-router.put("/changeProfilePicture", verifyUser, changeProfilePicture);
+router.put(
+  "/changeProfilePicture",
+  verifyUser,
+  upload.single("profile"),
+  changeProfilePicture
+);
 
 router.put("/changeEmail", verifyUser, changeEmail);
 

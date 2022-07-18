@@ -1,8 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const fsExtra = require("fs-extra");
-const { cloudinary } = require("../utils/cloudinary");
 const user = require("../model/userModel");
 const progress = require("../model/progressModel");
 
@@ -109,35 +107,17 @@ const viewUser = (req, res) => {
 };
 
 const changeProfilePicture = asyncHandler(async (req, res) => {
-  const file = req.files.profile;
-
-  if (
-    file.mimetype == "image/png" ||
-    file.mimetype == "image/jpeg" ||
-    file.mimetype == "application/octet-stream"
-  ) {
-    const cloudinaryUploader = await cloudinary.uploader.upload(
-      file.tempFilePath,
-      {
-        upload_preset: "expense_income_tracker",
-      }
-    );
-
-    user
-      .updateOne(
-        { _id: req.userInfo._id },
-        { profilePicture: cloudinaryUploader.url }
-      )
-      .then(() => {
-        res.send({ resM: "Profile Picture Updated" });
-      });
-
-    fsExtra.emptyDirSync("../EXPENSE-TRACKER-API/tmp");
-  } else {
+  if (req.file == undefined) {
     return res.status(400).send({
-      resM: "Invalid image format, only supports only one png or jpeg image format.",
+      resM: "Invalid image format, only supports png or jpeg image format.",
     });
   }
+
+  user
+    .updateOne({ _id: req.userInfo._id }, { profilePicture: req.file.path })
+    .then(() => {
+      res.send({ resM: "Profile Picture Updated" });
+    });
 });
 
 const changeEmail = (req, res) => {

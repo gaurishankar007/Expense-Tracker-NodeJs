@@ -1,8 +1,10 @@
 const asyncHandler = require("express-async-handler");
+const mongoose = require("mongoose");
 const expense = require("../model/expenseModel");
 const progress = require("../model/progressModel");
+const achievement = require("../model/achievementModel");
 
-const addExpense = (req, res) => {
+const addExpense = asyncHandler(async (req, res) => {
   const { name, amount, category } = req.body;
 
   const nameRegex = /^[a-zA-Z\s]*$/;
@@ -24,29 +26,110 @@ const addExpense = (req, res) => {
       .send({ resM: "Expense amount most be less than one crore" });
   }
 
-  const newExpense = new expense({
+  // for (let i = 0; i < 29; i++) {
+  await expense.create({
     user: req.userInfo._id,
     name: name,
     amount: amount,
     category: category,
   });
+  // }
 
-  newExpense.save().then(() => {
-    progress.findOne({ user: req.userInfo._id }).then((progressData) => {
-      progress
-        .updateOne(
-          { user: req.userInfo._id },
-          {
-            progress: progressData.progress + 10,
-            tmp: progressData.tmp + 10,
-          }
-        )
-        .then(() => {
-          res.status(201).send({ resM: "Expense added." });
-        });
-    });
+  const userProgress = await progress.findOne({ user: req.userInfo._id });
+  await progress.updateOne(
+    { user: req.userInfo._id },
+    {
+      progress: userProgress.progress + 10,
+      tmp: userProgress.tmp + 10,
+    }
+  );
+
+  const currentDateTime = new Date();
+  const thisMonth = new Date(
+    new Date(
+      currentDateTime.toISOString().split("T")[0].split("-")[0] +
+        "-" +
+        currentDateTime.toISOString().split("T")[0].split("-")[1] +
+        "-01"
+    ).getTime() +
+      currentDateTime.getTimezoneOffset() * 60 * 1000
+  );
+
+  const totalExpenses = await expense.count({
+    user: req.userInfo._id,
+    createdAt: { $gte: thisMonth },
   });
-};
+
+  const achievementIds = userProgress.newAchievement;
+
+  if (
+    totalExpenses > 30 &&
+    achievementIds.includes("62cf738317d764d0c6ef52ff") == false
+  ) {
+    achievementIds.push(mongoose.Types.ObjectId("62cf738317d764d0c6ef52ff"));
+    const newAchievement = await achievement.findOne({
+      _id: "62cf738317d764d0c6ef52ff",
+    });
+    const newProgressPoint = newAchievement.progressPoint;
+
+    const totalProgress = newProgressPoint + userProgress.progress + 10;
+    const totalProgressPoint = newProgressPoint + userProgress.tmp + 10;
+
+    await progress.updateOne(
+      { user: req.userInfo._id },
+      {
+        progress: totalProgress,
+        tmp: totalProgressPoint,
+        newAchievement: achievementIds,
+      }
+    );
+  } else if (
+    totalExpenses > 100 &&
+    achievementIds.includes("62c01ecc2744425ef8f43036") == false
+  ) {
+    achievementIds.push(mongoose.Types.ObjectId("62c01ecc2744425ef8f43036"));
+    const newAchievement = await achievement.findOne({
+      _id: "62c01ecc2744425ef8f43036",
+    });
+    const newProgressPoint = newAchievement.progressPoint;
+
+    const totalProgress = newProgressPoint + userProgress.progress + 10;
+    const totalProgressPoint = newProgressPoint + userProgress.tmp + 10;
+
+    await progress.updateOne(
+      { user: req.userInfo._id },
+      {
+        progress: totalProgress,
+        tmp: totalProgressPoint,
+        newAchievement: achievementIds,
+      }
+    );
+  } else if (
+    totalExpenses > 200 &&
+    achievementIds.includes("62c01ed62744425ef8f43039") == false
+  ) {
+    achievementIds.push(mongoose.Types.ObjectId("62c01ed62744425ef8f43039"));
+    const newAchievement = await achievement.findOne({
+      _id: "62c01ed62744425ef8f43039",
+    });
+    const newProgressPoint = newAchievement.progressPoint;
+
+    const totalProgress = newProgressPoint + userProgress.progress + 10;
+    const totalProgressPoint = newProgressPoint + userProgress.tmp + 10;
+
+    await progress.updateOne(
+      { user: req.userInfo._id },
+      {
+        progress: totalProgress,
+        tmp: totalProgressPoint,
+        newAchievement: achievementIds,
+      }
+    );
+  }
+
+  res.status(201);
+  res.json({ resM: "Expense added." });
+});
 
 const getDWMExpenses = asyncHandler(async (req, res) => {
   const currentDateTime = new Date();
@@ -263,23 +346,112 @@ const getSpecificExpenses = asyncHandler(async (req, res) => {
   });
 });
 
-const removeExpense = (req, res) => {
-  expense.findOneAndDelete({ _id: req.body.expenseId }).then(() => {
-    progress.findOne({ user: req.userInfo._id }).then((progressData) => {
-      progress
-        .updateOne(
-          { user: req.userInfo._id },
-          {
-            progress: progressData.progress - 10,
-            tmp: progressData.tmp - 10,
-          }
-        )
-        .then(() => {
-          res.send({ resM: "Expense removed." });
-        });
-    });
+const removeExpense = asyncHandler(async (req, res) => {
+  await expense.findOneAndDelete({ _id: req.body.expenseId });
+  const userProgress = await progress.findOne({ user: req.userInfo._id });
+
+  await progress.updateOne(
+    { user: req.userInfo._id },
+    {
+      progress: userProgress.progress - 10,
+      tmp: userProgress.tmp - 10,
+    }
+  );
+
+  const currentDateTime = new Date();
+  const thisMonth = new Date(
+    new Date(
+      currentDateTime.toISOString().split("T")[0].split("-")[0] +
+        "-" +
+        currentDateTime.toISOString().split("T")[0].split("-")[1] +
+        "-01"
+    ).getTime() +
+      currentDateTime.getTimezoneOffset() * 60 * 1000
+  );
+
+  const totalExpenses = await expense.count({
+    user: req.userInfo._id,
+    createdAt: { $gte: thisMonth },
   });
-};
+
+  const achievementIds = userProgress.newAchievement;
+
+  if (
+    totalExpenses <= 200 &&
+    achievementIds.includes("62c01ed62744425ef8f43039")
+  ) {
+    aId = achievementIds.indexOf("62c01ed62744425ef8f43039");
+    achievementIds.splice(aId, 1);
+
+    const pAchievement = await achievement.findOne({
+      _id: "62c01ed62744425ef8f43039",
+    });
+
+    const totalProgress =
+      userProgress.progress - pAchievement.progressPoint - 10;
+    const totalProgressPoint =
+      userProgress.tmp - pAchievement.progressPoint - 10;
+
+    await progress.updateOne(
+      { user: req.userInfo._id },
+      {
+        progress: totalProgress,
+        tmp: totalProgressPoint,
+        newAchievement: achievementIds,
+      }
+    );
+  } else if (
+    totalExpenses <= 100 &&
+    achievementIds.includes("62c01ecc2744425ef8f43036")
+  ) {
+    aId = achievementIds.indexOf("62c01ecc2744425ef8f43036");
+    achievementIds.splice(aId, 1);
+
+    const pAchievement = await achievement.findOne({
+      _id: "62c01ecc2744425ef8f43036",
+    });
+
+    const totalProgress =
+      userProgress.progress - pAchievement.progressPoint - 10;
+    const totalProgressPoint =
+      userProgress.tmp - pAchievement.progressPoint - 10;
+
+    await progress.updateOne(
+      { user: req.userInfo._id },
+      {
+        progress: totalProgress,
+        tmp: totalProgressPoint,
+        newAchievement: achievementIds,
+      }
+    );
+  } else if (
+    totalExpenses <= 30 &&
+    achievementIds.includes("62cf738317d764d0c6ef52ff")
+  ) {
+    aId = achievementIds.indexOf("62cf738317d764d0c6ef52ff");
+    achievementIds.splice(aId, 1);
+
+    const pAchievement = await achievement.findOne({
+      _id: "62cf738317d764d0c6ef52ff",
+    });
+
+    const totalProgress =
+      userProgress.progress - pAchievement.progressPoint - 10;
+    const totalProgressPoint =
+      userProgress.tmp - pAchievement.progressPoint - 10;
+
+    await progress.updateOne(
+      { user: req.userInfo._id },
+      {
+        progress: totalProgress,
+        tmp: totalProgressPoint,
+        newAchievement: achievementIds,
+      }
+    );
+  }
+
+  res.send({ resM: "Expense removed." });
+});
 
 const editExpense = (req, res) => {
   const { expenseId, name, amount, category } = req.body;

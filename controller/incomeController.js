@@ -1,6 +1,8 @@
 const asyncHandler = require("express-async-handler");
+const mongoose = require("mongoose");
 const income = require("../model/incomeModel");
 const progress = require("../model/progressModel");
+const achievement = require("../model/achievementModel");
 
 const addIncome = (req, res) => {
   const { name, amount, category } = req.body;

@@ -152,10 +152,6 @@ const userCalculateProgress = asyncHandler(async (req, res) => {
       achievementIds.push(userProgress.newAchievement[i]);
     }
 
-    const totalAchievements = await achievement.find({
-      _id: { $in: achievementIds },
-    });
-
     const totalProgress = newProgressPoint + userProgress.progress;
     const totalProgressPoint = newProgressPoint + userProgress.tmp;
 
@@ -167,7 +163,7 @@ const userCalculateProgress = asyncHandler(async (req, res) => {
           tmp: 0,
           pmp: totalProgressPoint,
           newAchievement: [],
-          oldAchievement: totalAchievements,
+          oldAchievement: achievementIds,
           pmc: previousMonthDate,
         }
       )
