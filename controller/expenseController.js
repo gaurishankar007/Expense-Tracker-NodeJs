@@ -26,14 +26,12 @@ const addExpense = asyncHandler(async (req, res) => {
       .send({ resM: "Expense amount most be less than one crore" });
   }
 
-  // for (let i = 0; i < 29; i++) {
   await expense.create({
     user: req.userInfo._id,
     name: name,
     amount: amount,
     category: category,
   });
-  // }
 
   const userProgress = await progress.findOne({ user: req.userInfo._id });
   await progress.updateOne(

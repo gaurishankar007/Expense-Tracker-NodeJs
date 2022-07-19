@@ -4,7 +4,7 @@ const income = require("../model/incomeModel");
 const progress = require("../model/progressModel");
 const achievement = require("../model/achievementModel");
 
-const addIncome = (req, res) => {
+const addIncome = asyncHandler(async (req, res) => {
   const { name, amount, category } = req.body;
 
   const nameRegex = /^[a-zA-Z\s]*$/;
@@ -26,29 +26,108 @@ const addIncome = (req, res) => {
       .send({ resM: "Income amount most be less than one crore" });
   }
 
-  const newIncome = new income({
+  await income.create({
     user: req.userInfo._id,
     name: name,
     amount: amount,
     category: category,
   });
 
-  newIncome.save().then(() => {
-    progress.findOne({ user: req.userInfo._id }).then((progressData) => {
-      progress
-        .updateOne(
-          { user: req.userInfo._id },
-          {
-            progress: progressData.progress + 15,
-            tmp: progressData.tmp + 15,
-          }
-        )
-        .then(() => {
-          res.status(201).send({ resM: "Income added." });
-        });
-    });
+  const userProgress = await progress.findOne({ user: req.userInfo._id });
+  await progress.updateOne(
+    { user: req.userInfo._id },
+    {
+      progress: userProgress.progress + 15,
+      tmp: userProgress.progress + 15,
+    }
+  );
+
+  const currentDateTime = new Date();
+  const thisMonth = new Date(
+    new Date(
+      currentDateTime.toISOString().split("T")[0].split("-")[0] +
+        "-" +
+        currentDateTime.toISOString().split("T")[0].split("-")[1] +
+        "-01"
+    ).getTime() +
+      currentDateTime.getTimezoneOffset() * 60 * 1000
+  );
+
+  const totalIncomes = await income.count({
+    user: req.userInfo._id,
+    createdAt: { $gte: thisMonth },
   });
-};
+  
+  const achievementIds = userProgress.newAchievement;
+
+  if (
+    totalIncomes > 30 &&
+    achievementIds.includes("62cf736317d764d0c6ef52fc") == false
+  ) {
+    achievementIds.push(mongoose.Types.ObjectId("62cf736317d764d0c6ef52fc"));
+    const newAchievement = await achievement.findOne({
+      _id: "62cf736317d764d0c6ef52fc",
+    });
+    const newProgressPoint = newAchievement.progressPoint;
+
+    const totalProgress = newProgressPoint + userProgress.progress + 15;
+    const totalProgressPoint = newProgressPoint + userProgress.tmp + 15;
+
+    await progress.updateOne(
+      { user: req.userInfo._id },
+      {
+        progress: totalProgress,
+        tmp: totalProgressPoint,
+        newAchievement: achievementIds,
+      }
+    );
+  } else if (
+    totalIncomes > 100 &&
+    achievementIds.includes("62c0202d2744425ef8f43042") == false
+  ) {
+    achievementIds.push(mongoose.Types.ObjectId("62c0202d2744425ef8f43042"));
+    const newAchievement = await achievement.findOne({
+      _id: "62c0202d2744425ef8f43042",
+    });
+    const newProgressPoint = newAchievement.progressPoint;
+
+    const totalProgress = newProgressPoint + userProgress.progress + 15;
+    const totalProgressPoint = newProgressPoint + userProgress.tmp + 15;
+
+    await progress.updateOne(
+      { user: req.userInfo._id },
+      {
+        progress: totalProgress,
+        tmp: totalProgressPoint,
+        newAchievement: achievementIds,
+      }
+    );
+  } else if (
+    totalIncomes > 200 &&
+    achievementIds.includes("62cc26c437473374a8eed577") == false
+  ) {
+    achievementIds.push(mongoose.Types.ObjectId("62cc26c437473374a8eed577"));
+    const newAchievement = await achievement.findOne({
+      _id: "62cc26c437473374a8eed577",
+    });
+    const newProgressPoint = newAchievement.progressPoint;
+
+    const totalProgress = newProgressPoint + userProgress.progress + 15;
+    const totalProgressPoint = newProgressPoint + userProgress.tmp + 15;
+
+    await progress.updateOne(
+      { user: req.userInfo._id },
+      {
+        progress: totalProgress,
+        tmp: totalProgressPoint,
+        newAchievement: achievementIds,
+      }
+    );
+  }
+
+  res.status(201);
+  res.json({ resM: "Income added." });
+});
 
 const getDWMIncomes = asyncHandler(async (req, res) => {
   const currentDateTime = new Date();
@@ -265,23 +344,112 @@ const getSpecificIncomes = asyncHandler(async (req, res) => {
   });
 });
 
-const removeIncome = (req, res) => {
-  income.findOneAndDelete({ _id: req.body.incomeId }).then(() => {
-    progress.findOne({ user: req.userInfo._id }).then((progressData) => {
-      progress
-        .updateOne(
-          { user: req.userInfo._id },
-          {
-            progress: progressData.progress - 15,
-            tmp: progressData.tmp - 15,
-          }
-        )
-        .then(() => {
-          res.send({ resM: "Income removed." });
-        });
-    });
+const removeIncome = asyncHandler(async (req, res) => {
+  await income.findOneAndDelete({ _id: req.body.incomeId });
+  const userProgress = await progress.findOne({ user: req.userInfo._id });
+
+  await progress.updateOne(
+    { user: req.userInfo._id },
+    {
+      progress: userProgress.progress - 15,
+      tmp: userProgress.tmp - 15,
+    }
+  );
+
+  const currentDateTime = new Date();
+  const thisMonth = new Date(
+    new Date(
+      currentDateTime.toISOString().split("T")[0].split("-")[0] +
+        "-" +
+        currentDateTime.toISOString().split("T")[0].split("-")[1] +
+        "-01"
+    ).getTime() +
+      currentDateTime.getTimezoneOffset() * 60 * 1000
+  );
+
+  const totalIncomes = await income.count({
+    user: req.userInfo._id,
+    createdAt: { $gte: thisMonth },
   });
-};
+
+  const achievementIds = userProgress.newAchievement;
+
+  if (
+    totalIncomes <= 200 &&
+    achievementIds.includes("62cc26c437473374a8eed577")
+  ) {
+    aId = achievementIds.indexOf("62cc26c437473374a8eed577");
+    achievementIds.splice(aId, 1);
+
+    const pAchievement = await achievement.findOne({
+      _id: "62cc26c437473374a8eed577",
+    });
+
+    const totalProgress =
+      userProgress.progress - pAchievement.progressPoint - 15;
+    const totalProgressPoint =
+      userProgress.tmp - pAchievement.progressPoint - 15;
+
+    await progress.updateOne(
+      { user: req.userInfo._id },
+      {
+        progress: totalProgress,
+        tmp: totalProgressPoint,
+        newAchievement: achievementIds,
+      }
+    );
+  } else if (
+    totalIncomes <= 100 &&
+    achievementIds.includes("62c0202d2744425ef8f43042")
+  ) {
+    aId = achievementIds.indexOf("62c0202d2744425ef8f43042");
+    achievementIds.splice(aId, 1);
+
+    const pAchievement = await achievement.findOne({
+      _id: "62c0202d2744425ef8f43042",
+    });
+
+    const totalProgress =
+      userProgress.progress - pAchievement.progressPoint - 15;
+    const totalProgressPoint =
+      userProgress.tmp - pAchievement.progressPoint - 15;
+
+    await progress.updateOne(
+      { user: req.userInfo._id },
+      {
+        progress: totalProgress,
+        tmp: totalProgressPoint,
+        newAchievement: achievementIds,
+      }
+    );
+  } else if (
+    totalIncomes <= 30 &&
+    achievementIds.includes("62cf736317d764d0c6ef52fc")
+  ) {
+    aId = achievementIds.indexOf("62cf736317d764d0c6ef52fc");
+    achievementIds.splice(aId, 1);
+
+    const pAchievement = await achievement.findOne({
+      _id: "62cf736317d764d0c6ef52fc",
+    });
+
+    const totalProgress =
+      userProgress.progress - pAchievement.progressPoint - 15;
+    const totalProgressPoint =
+      userProgress.tmp - pAchievement.progressPoint - 15;
+
+    await progress.updateOne(
+      { user: req.userInfo._id },
+      {
+        progress: totalProgress,
+        tmp: totalProgressPoint,
+        newAchievement: achievementIds,
+      }
+    );
+  }
+
+    res.send({ resM: "Income removed." });
+});
 
 const editIncome = (req, res) => {
   const { incomeId, name, amount, category } = req.body;
