@@ -82,23 +82,52 @@ const loginUser = (req, res) => {
         res.status(400).send({ resM: "Incorrect password, try again." });
       } else {
         const token = jwt.sign({ userId: userData1._id }, "loginKey");
-        if (userData1.admin) {
-          res.status(202).send({
-            token: token,
-            resM: "Login success as admin.",
-            userData: userData1,
-          });
-        } else {
-          res.status(202).send({
-            token: token,
-            resM: "Login success.",
-            userData: userData1,
-          });
-        }
+        res.status(202).send({
+          token: token,
+          resM: "Login success.",
+          userData: userData1,
+        });
       }
     });
   });
 };
+
+const googleSignIn = asyncHandler(async (req, res) => {
+  const { email, profilePicture, profileName } = req.body;
+
+  const userData = await user.findOne({ email: email });
+  if (userData != null) {
+    const userData = await user.findOne({ email: email });
+    const token = jwt.sign({ userId: userData._id }, "loginKey");
+    res.status(202).send({
+      token: token,
+      resM: "Login success.",
+      userData: userData,
+    });
+  } else {
+    const currentDate = new Date();
+    const previousMonth = new Date(currentDate.getTime() - 2592000000);
+
+    const newUser = await user.create({
+      email: email,
+      password: "google",
+      profilePicture: profilePicture,
+      profileName: profileName,
+    });
+
+    await progress.create({
+      user: newUser._id,
+      pmc: previousMonth,
+    });
+
+    const token = jwt.sign({ userId: newUser._id }, "loginKey");
+    res.status(202).send({
+      token: token,
+      resM: "Login success.",
+      userData: newUser,
+    });
+  }
+});
 
 const viewUser = (req, res) => {
   user.findOne({ _id: req.userInfo._id }).then((userData) => {
@@ -230,6 +259,7 @@ const publishProgress = (req, res) => {
 module.exports = {
   registerUser,
   loginUser,
+  googleSignIn,
   viewUser,
   changeProfilePicture,
   changeEmail,

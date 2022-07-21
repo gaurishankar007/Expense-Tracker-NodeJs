@@ -59,11 +59,13 @@ const addExpense = asyncHandler(async (req, res) => {
   });
 
   const achievementIds = userProgress.newAchievement;
+  var achievementUnlocked = false;
 
   if (
     totalExpenses > 30 &&
     achievementIds.includes("62cf738317d764d0c6ef52ff") == false
   ) {
+    achievementUnlocked = true;
     achievementIds.push(mongoose.Types.ObjectId("62cf738317d764d0c6ef52ff"));
     const newAchievement = await achievement.findOne({
       _id: "62cf738317d764d0c6ef52ff",
@@ -85,6 +87,7 @@ const addExpense = asyncHandler(async (req, res) => {
     totalExpenses > 100 &&
     achievementIds.includes("62c01ecc2744425ef8f43036") == false
   ) {
+    achievementUnlocked = true;
     achievementIds.push(mongoose.Types.ObjectId("62c01ecc2744425ef8f43036"));
     const newAchievement = await achievement.findOne({
       _id: "62c01ecc2744425ef8f43036",
@@ -106,6 +109,7 @@ const addExpense = asyncHandler(async (req, res) => {
     totalExpenses > 200 &&
     achievementIds.includes("62c01ed62744425ef8f43039") == false
   ) {
+    achievementUnlocked = true;
     achievementIds.push(mongoose.Types.ObjectId("62c01ed62744425ef8f43039"));
     const newAchievement = await achievement.findOne({
       _id: "62c01ed62744425ef8f43039",
@@ -126,7 +130,10 @@ const addExpense = asyncHandler(async (req, res) => {
   }
 
   res.status(201);
-  res.json({ resM: "Expense added." });
+  res.json({
+    resM: "Expense added.",
+    achievementUnlocked: achievementUnlocked,
+  });
 });
 
 const getDWMExpenses = asyncHandler(async (req, res) => {
@@ -147,19 +154,19 @@ const getDWMExpenses = asyncHandler(async (req, res) => {
 
   if (currentDate <= 7) {
     weekFirstDate = "01";
-    weekLastDate = "07";
+    weekLastDate = "08";
   } else if (currentDate <= 14) {
     weekFirstDate = "08";
-    weekLastDate = "14";
+    weekLastDate = "15";
   } else if (currentDate <= 21) {
     weekFirstDate = "15";
-    weekLastDate = "21";
+    weekLastDate = "22";
   } else if (currentDate <= 28) {
     weekFirstDate = "22";
-    weekLastDate = "28";
+    weekLastDate = "29";
   } else if (currentDate < 35) {
     weekFirstDate = "29";
-    weekLastDate = "31";
+    weekLastDate = "32";
   }
 
   weekFirstDate = new Date(

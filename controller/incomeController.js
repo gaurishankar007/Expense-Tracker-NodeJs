@@ -57,13 +57,15 @@ const addIncome = asyncHandler(async (req, res) => {
     user: req.userInfo._id,
     createdAt: { $gte: thisMonth },
   });
-  
+
   const achievementIds = userProgress.newAchievement;
+  var achievementUnlocked = false;
 
   if (
     totalIncomes > 30 &&
     achievementIds.includes("62cf736317d764d0c6ef52fc") == false
   ) {
+    achievementUnlocked = true;
     achievementIds.push(mongoose.Types.ObjectId("62cf736317d764d0c6ef52fc"));
     const newAchievement = await achievement.findOne({
       _id: "62cf736317d764d0c6ef52fc",
@@ -85,6 +87,7 @@ const addIncome = asyncHandler(async (req, res) => {
     totalIncomes > 100 &&
     achievementIds.includes("62c0202d2744425ef8f43042") == false
   ) {
+    achievementUnlocked = true;
     achievementIds.push(mongoose.Types.ObjectId("62c0202d2744425ef8f43042"));
     const newAchievement = await achievement.findOne({
       _id: "62c0202d2744425ef8f43042",
@@ -106,6 +109,7 @@ const addIncome = asyncHandler(async (req, res) => {
     totalIncomes > 200 &&
     achievementIds.includes("62cc26c437473374a8eed577") == false
   ) {
+    achievementUnlocked = true;
     achievementIds.push(mongoose.Types.ObjectId("62cc26c437473374a8eed577"));
     const newAchievement = await achievement.findOne({
       _id: "62cc26c437473374a8eed577",
@@ -126,7 +130,7 @@ const addIncome = asyncHandler(async (req, res) => {
   }
 
   res.status(201);
-  res.json({ resM: "Income added." });
+  res.json({ resM: "Income added.", achievementUnlocked: achievementUnlocked });
 });
 
 const getDWMIncomes = asyncHandler(async (req, res) => {
@@ -147,19 +151,19 @@ const getDWMIncomes = asyncHandler(async (req, res) => {
 
   if (currentDate <= 7) {
     weekFirstDate = "01";
-    weekLastDate = "07";
+    weekLastDate = "08";
   } else if (currentDate <= 14) {
     weekFirstDate = "08";
-    weekLastDate = "14";
+    weekLastDate = "15";
   } else if (currentDate <= 21) {
     weekFirstDate = "15";
-    weekLastDate = "21";
+    weekLastDate = "22";
   } else if (currentDate <= 28) {
     weekFirstDate = "22";
-    weekLastDate = "28";
+    weekLastDate = "29";
   } else if (currentDate < 35) {
     weekFirstDate = "29";
-    weekLastDate = "31";
+    weekLastDate = "32";
   }
 
   weekFirstDate = new Date(
@@ -448,7 +452,7 @@ const removeIncome = asyncHandler(async (req, res) => {
     );
   }
 
-    res.send({ resM: "Income removed." });
+  res.send({ resM: "Income removed." });
 });
 
 const editIncome = (req, res) => {

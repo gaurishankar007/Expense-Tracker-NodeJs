@@ -122,20 +122,26 @@ const userCalculateProgress = asyncHandler(async (req, res) => {
     const saving = ((incomeAmount - expenseAmount) / incomeAmount) * 100;
 
     const achievementIds = [];
+    var achievementUnlocked = false;
 
     if (expenseDays.length >= 29) {
+      achievementUnlocked = true;
       achievementIds.push(mongoose.Types.ObjectId("62c01e212744425ef8f43030"));
     }
     if (incomeDays.length >= 29) {
+      achievementUnlocked = true;
       achievementIds.push(mongoose.Types.ObjectId("62c01e4e2744425ef8f43033"));
     }
     if (saving > 25) {
+      achievementUnlocked = true;
       achievementIds.push(mongoose.Types.ObjectId("62cf73c317d764d0c6ef5302"));
     }
     if (saving > 50) {
+      achievementUnlocked = true;
       achievementIds.push(mongoose.Types.ObjectId("62c01f8b2744425ef8f4303f"));
     }
     if (saving > 75) {
+      achievementUnlocked = true;
       achievementIds.push(mongoose.Types.ObjectId("62c01f612744425ef8f4303c"));
     }
 
@@ -168,7 +174,10 @@ const userCalculateProgress = asyncHandler(async (req, res) => {
         }
       )
       .then(() => {
-        res.send({ resM: "Previous month progress calculated." });
+        res.send({
+          resM: "Previous month progress calculated.",
+          achievementUnlocked: achievementUnlocked,
+        });
       });
   }
 });
