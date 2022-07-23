@@ -67,6 +67,7 @@ const userCalculateProgress = asyncHandler(async (req, res) => {
   if (progressCalMonth === previousMonth) {
     res.send({
       resM: "Progress is not ready to be calculated yet.",
+      achievementUnlocked: false,
     });
   } else if (progressCalMonth < previousMonth) {
     const tm = new Date(
