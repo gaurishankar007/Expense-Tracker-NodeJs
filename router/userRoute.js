@@ -7,11 +7,8 @@ const {
   loginUser,
   googleSignIn,
   viewUser,
-  changeProfilePicture,
-  changeEmail,
-  changeProfileName,
+  changeProfilePicture,changeProfileInfo,
   changePassword,
-  changeGender,
   publishProgress,
 } = require("../controller/userController");
 
@@ -30,13 +27,9 @@ router.put(
   changeProfilePicture
 );
 
-router.put("/changeEmail", verifyUser, changeEmail);
-
-router.put("/changeProfileName", verifyUser, changeProfileName);
+router.put("/changeProfileInfo", verifyUser, changeProfileInfo);
 
 router.put("/changePassword", verifyUser, changePassword);
-
-router.put("/changeGender", verifyUser, changeGender);
 
 router.get("/progressPublication", verifyUser, publishProgress);
 

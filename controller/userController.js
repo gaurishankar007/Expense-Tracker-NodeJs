@@ -149,43 +149,46 @@ const changeProfilePicture = asyncHandler(async (req, res) => {
     });
 });
 
-const changeEmail = (req, res) => {
-  const email = req.body.email;
+const changeProfileInfo = asyncHandler(async (req, res) => {
+  const { email, profileName, gender } = req.body;
+
   const emailRegex = new RegExp(
     "^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+.[a-zA-Z]+"
   );
+  const profileNameRegex = /^[a-zA-Z\s]*$/;
 
-  if (email.trim() === "") {
-    return res.status(400).send({ resM: "Provide email address." });
+  if (
+    email.trim() === "" ||
+    profileName.trim() === "" ||
+    gender.trim() === ""
+  ) {
+    return res.status(400).send({ resM: "Provide all information." });
   } else if (!emailRegex.test(email)) {
     return res.status(400).send({ resM: "Invalid email address." });
+  } else if (!profileNameRegex.test(profileName)) {
+    return res.status(400).send({ resM: "Invalid profile name." });
+  } else if (profileName.length <= 2 || profileName.length >= 21) {
+    return res
+      .status(400)
+      .send({ resM: "Profile name most contain 3 to 20 characters." });
   }
 
-  user.findOne({ email: email }).then(function (userData) {
-    if (userData != null) {
-      return res
-        .status(400)
-        .send({ resM: "This email is already used, try another." });
-    }
-    user.updateOne({ _id: req.userInfo._id }, { email: email }).then(() => {
-      res.send({ resM: "Your email has been changed." });
-    });
-  });
-};
-
-const changeProfileName = (req, res) => {
-  const profileName = req.body.profileName;
-
-  if (profileName.trim() === "") {
-    return res.status(400).send({ resM: "Provide profile name." });
+  const userData = await user.findOne({ email: email });
+  if (userData != null && email != req.userInfo.email) {
+    return res
+      .status(400)
+      .send({ resM: "This email is already used, try another." });
   }
 
   user
-    .updateOne({ _id: req.userInfo._id }, { profileName: profileName })
+    .updateOne(
+      { _id: req.userInfo._id },
+      { email: email, profileName: profileName, gender: gender }
+    )
     .then(() => {
-      res.send({ resM: "Your profile name has been changed." });
+      res.send({ resM: "Profile information updated." });
     });
-};
+});
 
 const changePassword = (req, res) => {
   const currentPassword = req.body.currentPassword;
@@ -227,18 +230,6 @@ const changePassword = (req, res) => {
   });
 };
 
-const changeGender = (req, res) => {
-  const gender = req.body.gender;
-
-  if (gender.trim() === "") {
-    return res.status(400).send({ resM: "Gender not provided." });
-  }
-
-  user.updateOne({ _id: req.userInfo._id }, { gender: gender }).then(() => {
-    res.send({ resM: "Your gender has been changed." });
-  });
-};
-
 const publishProgress = (req, res) => {
   user.findOne({ _id: req.userInfo._id }).then((userData) => {
     user
@@ -262,9 +253,7 @@ module.exports = {
   googleSignIn,
   viewUser,
   changeProfilePicture,
-  changeEmail,
-  changeProfileName,
+  changeProfileInfo,
   changePassword,
-  changeGender,
   publishProgress,
 };
