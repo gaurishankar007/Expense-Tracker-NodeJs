@@ -180,10 +180,6 @@ const userHomeData = asyncHandler(async (req, res) => {
     previousMonthIncomeAmount: previousMonthIncomeAmount,
     thisMonthExpenseCategories: thisMonthExpenseCategories,
     thisMonthIncomeCategories: thisMonthIncomeCategories,
-    thisMonthExpenseRate: thisMonthExpenseRate,
-    thisMonthIncomeRate: thisMonthIncomeRate,
-    previousMonthExpenseRate: previousMonthExpenseRate,
-    previousMonthIncomeRate: previousMonthIncomeRate,
   });
 });
 
