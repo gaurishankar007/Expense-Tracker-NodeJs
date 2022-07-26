@@ -8,6 +8,10 @@ app.use(cors());
 
 require("./database/connectDB");
 
+app.get("/", (req, res) => {
+  res.send("Welcome to expense income tracker app.");
+});
+
 const userRoute = require("./router/userRoute");
 app.use("/user", userRoute);
 
