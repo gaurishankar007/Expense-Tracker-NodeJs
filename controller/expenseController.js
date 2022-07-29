@@ -164,9 +164,9 @@ const getDWMExpenses = asyncHandler(async (req, res) => {
   } else if (currentDate <= 28) {
     weekFirstDate = "22";
     weekLastDate = "29";
-  } else if (currentDate < 35) {
+  } else if (currentDate < 32) {
     weekFirstDate = "29";
-    weekLastDate = "32";
+    weekLastDate = "31";
   }
 
   weekFirstDate = new Date(
@@ -190,6 +190,10 @@ const getDWMExpenses = asyncHandler(async (req, res) => {
     ).getTime() +
       currentDateTime.getTimezoneOffset() * 60 * 1000
   );
+
+  if(currentDate > 28 ) {
+    weekLastDate = new Date(weekLastDate.getTime() + 86400000 )
+  }
 
   const thisMonth = new Date(
     new Date(
