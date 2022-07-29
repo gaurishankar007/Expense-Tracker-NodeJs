@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { cloudinary } = require("../utils/cloudinary");
 const user = require("../model/userModel");
 const progress = require("../model/progressModel");
 
@@ -140,6 +141,17 @@ const changeProfilePicture = asyncHandler(async (req, res) => {
     return res.status(400).send({
       resM: "Invalid image format, only supports png or jpeg image format.",
     });
+  }
+
+  const userData = await user.findOne({ _id: req.userInfo._id });
+  if (
+    userData.profilePicture !==
+    "https://res.cloudinary.com/gaurishankar/image/upload/v1658148482/ExpenseTracker/p3o8edl8jnwvdhk5xjmx.png"
+  ) {
+    const result = await cloudinary.uploader.destroy(
+      "ExpenseTracker/" + 
+      userData.profilePicture.split("ExpenseTracker/")[1].split(".")[0]
+      );
   }
 
   user
