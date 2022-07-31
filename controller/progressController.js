@@ -58,8 +58,39 @@ const userCalculateProgress = asyncHandler(async (req, res) => {
   const progressCalMonth = parseInt(
     userProgress.pmc.toISOString().split("T")[0].split("-")[1]
   );
+
+  const month28 = [2];
+  const month30 = [4, 6, 9, 11];
+  const month31 = [1, 3, 5, 7, 8, 10, 12];
+
   const currentDate = new Date();
-  const previousMonthDate = new Date(currentDate.getTime() - 2592000000);
+  var previousMonthDate = 0;
+  
+  if (
+    month28.includes(
+      parseInt(currentDate.toISOString().split("T")[0].split("-")[1])
+    )
+  ) {
+    const leap =
+      new Date(
+        parseInt(currentDate.toISOString().split("T")[0].split("-")[0]),
+        1,
+        29
+      ).getDate() === 29;
+    if (leap) {
+      previousMonthDate = new Date(currentDate.getTime() - 2505600000);
+    } else {
+      previousMonthDate = new Date(currentDate.getTime() - 2419200000);
+    }
+  } else if (
+    month30.includes(
+      parseInt(currentDate.toISOString().split("T")[0].split("-")[1])
+    )
+  ) {
+    previousMonthDate = new Date(currentDate.getTime() - 2592000000);
+  } else {
+    previousMonthDate = new Date(currentDate.getTime() - 2678400000);
+  }
   const previousMonth = parseInt(
     previousMonthDate.toISOString().split("T")[0].split("-")[1]
   );
