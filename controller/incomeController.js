@@ -38,7 +38,7 @@ const addIncome = asyncHandler(async (req, res) => {
     { user: req.userInfo._id },
     {
       progress: userProgress.progress + 15,
-      tmp: userProgress.progress + 15,
+      tmp: userProgress.tmp + 15,
     }
   );
 
