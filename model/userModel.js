@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
 
-    profileName: {
+    profileName: {       
       type: String,
       trim: true,
     },
@@ -31,6 +31,11 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+
+    passReset: {
+      type: Date,
+      default: null
+    }
   },
   {
     timestamps: true,

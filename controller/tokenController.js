@@ -80,8 +80,9 @@ const verifyToken = (req, res) => {
     }
 
     bcryptjs.hash(tokenData.password, 10, function (e, hashed_value) {
+      const currentDate = new Date();
       user
-        .findOneAndUpdate({ _id: userId }, { password: hashed_value })
+        .findOneAndUpdate({ _id: userId }, { password: hashed_value,  passReset: currentDate })
         .then(() => {
           token.deleteOne({ token: tokenNumber, user: userId }).then(() => {
             res.send({ resM: "Password reset. Now log in with new password." });

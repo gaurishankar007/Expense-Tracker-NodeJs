@@ -6,8 +6,10 @@ const {
   registerUser,
   loginUser,
   googleSignIn,
+  checkPassword,
   viewUser,
-  changeProfilePicture,changeProfileInfo,
+  changeProfilePicture,
+  changeProfileInfo,
   changePassword,
   publishProgress,
 } = require("../controller/userController");
@@ -17,6 +19,8 @@ router.post("/register", registerUser);
 router.post("/login", loginUser);
 
 router.post("/googleSignIn", googleSignIn);
+
+router.get("/checkPassword", verifyUser, checkPassword);
 
 router.get("/view", verifyUser, viewUser);
 

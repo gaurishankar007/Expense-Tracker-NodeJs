@@ -54,6 +54,7 @@ const registerUser = (req, res) => {
         email: email,
         password: hashed_value,
         profileName: profileName,
+        passReset: currentDate,
       });
 
       const newProgress = new progress({
@@ -83,6 +84,7 @@ const loginUser = (req, res) => {
         res.status(400).send({ resM: "Incorrect password, try again." });
       } else {
         const token = jwt.sign({ userId: userData1._id }, "loginKey");
+
         res.status(202).send({
           token: token,
           resM: "Login success.",
@@ -130,6 +132,20 @@ const googleSignIn = asyncHandler(async (req, res) => {
   }
 });
 
+const checkPassword = (req, res) => {
+  user.findOne({ _id: req.userInfo._id }).then((userData) => {
+    var changePassword = false;
+
+    if (userData.passReset !== null) {
+      const currentDate = new Date();
+      const time = currentDate.getTime() - userData.passReset.getTime();
+      changePassword = time > 5184000000 ? true : false;
+    }
+
+    res.send(changePassword);
+  });
+};
+
 const viewUser = (req, res) => {
   user.findOne({ _id: req.userInfo._id }).then((userData) => {
     res.send(userData);
@@ -149,9 +165,9 @@ const changeProfilePicture = asyncHandler(async (req, res) => {
     "https://res.cloudinary.com/gaurishankar/image/upload/v1658148482/ExpenseTracker/p3o8edl8jnwvdhk5xjmx.png"
   ) {
     const result = await cloudinary.uploader.destroy(
-      "ExpenseTracker/" + 
-      userData.profilePicture.split("ExpenseTracker/")[1].split(".")[0]
-      );
+      "ExpenseTracker/" +
+        userData.profilePicture.split("ExpenseTracker/")[1].split(".")[0]
+    );
   }
 
   user
@@ -232,8 +248,12 @@ const changePassword = (req, res) => {
           .send({ resM: "Current Password did not match." });
       }
       bcryptjs.hash(newPassword, 10, (e, hashed_pass) => {
+        const currentDate = new Date();
         user
-          .updateOne({ _id: userData._id }, { password: hashed_pass })
+          .updateOne(
+            { _id: userData._id },
+            { password: hashed_pass, passReset: currentDate }
+          )
           .then(() => {
             res.send({ resM: "Your password has been changed." });
           });
@@ -263,6 +283,7 @@ module.exports = {
   registerUser,
   loginUser,
   googleSignIn,
+  checkPassword,
   viewUser,
   changeProfilePicture,
   changeProfileInfo,
